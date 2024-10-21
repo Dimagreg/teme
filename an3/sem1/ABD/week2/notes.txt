@@ -1,0 +1,30 @@
+DOCKER COMMANDS:
+
+docker exec hello_world /bin/bash
+
+docer run -it --rm hello_world /bin/bash
+
+CTRL + P + Q (quit container but keeps running in background)
+
+docker pull ubuntu:latest
+
+docker run -it --rm -v c:/code:/code ubuntu /bin/bash
+
+Dockerfile:
+FROM gcc:latest
+
+WORKDIR /app
+COPY . /app
+
+RUN gcc ...
+RUN ./fis
+
+
+docker build -t my_image:1.0 .
+docker image rm my_image:1.0
+docker run -it --rm -v .:/app my_image:1.0 /bin/bash
+
+TASK:
+- create a docker image
+- compiles automatically fis.c in current dir (docker run)
+- 

@@ -1,0 +1,10 @@
+services:
+  mysql-lab-vol:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /mysql_data:/mysql_data
+      - /mysql_conf:/mysql_conf
+    environment:
+      MYSQL_ROOT_PASSWORD: dima
