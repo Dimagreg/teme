@@ -23,7 +23,8 @@ struct person
 };
 
 void readArguments(char* argv[]);
-void readInputFile(struct person *st_person);
+void readInputFile(struct person **st_person);
+void processSimulationSequential(struct person **st_person);
 
 int main(int argc, char* argv[])
 {
@@ -38,7 +39,9 @@ int main(int argc, char* argv[])
 
     readArguments(argv);
 
-    readInputFile(st_person);
+    readInputFile(&st_person);
+
+    processSimulationSequential(&st_person);
 
     return 0;
 }
@@ -83,7 +86,7 @@ void readArguments(char *argv[])
     strcpy(inputFileName, argv[2]);
 }
 
-void readInputFile(struct person *st_person)
+void readInputFile(struct person **st_person)
 {
     FILE *file = fopen(inputFileName, "r");
 
@@ -105,7 +108,7 @@ void readInputFile(struct person *st_person)
         exit(1);
     }
 
-    if ((st_person = malloc(PEOPLE_COUNT * sizeof(struct person))) == NULL)
+    if ((*st_person = malloc(PEOPLE_COUNT * sizeof(struct person))) == NULL)
     {
         perror(NULL);
         exit(1);
@@ -113,11 +116,19 @@ void readInputFile(struct person *st_person)
 
     for (int i = 0; i < PEOPLE_COUNT; i++)
     {
-        if (fscanf(file, "%d %d %d %d %d %d", &st_person[i].personId, &st_person[i].x, &st_person[i].y,
-                &st_person[i].current_status, &st_person[i].pattern_direction, &st_person[i].pattern_amplitude) != 6)
+        if (fscanf(file, "%d %d %d %d %d %d", &(*st_person)[i].personId, &(*st_person)[i].x, &(*st_person)[i].y,
+                &(*st_person)[i].current_status, &(*st_person)[i].pattern_direction, &(*st_person)[i].pattern_amplitude) != 6)
         {
-            printf("error reading person; line %d", i + 3); // add 3 to skip lines for matrix size and people count
+            printf("error reading people. check if lines are formatted correctly.\n");
             exit(1);
         }
+    }
+}
+
+void processSimulationSequential(struct person **st_person)
+{
+    for (int i = 0; i < TOTAL_SIMULATION_TIME; i++)
+    {
+        
     }
 }
