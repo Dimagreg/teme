@@ -12,6 +12,8 @@ int MAX_X_COORD;
 int MAX_Y_COORD;
 int PEOPLE_COUNT;
 
+int ZONE[][]; // simulation zone where we compute if a person gets infected or not
+
 struct person
 {
     int personId;
@@ -25,6 +27,9 @@ struct person
 void readArguments(char* argv[]);
 void readInputFile(struct person **st_person);
 void processSimulationSequential(struct person **st_person);
+void updateLocationSequential(struct person **st_person);
+void computeNextStatusSequential(struct person **st_person);
+void setCurrentStatusSequential(struct person **st_person);
 
 int main(int argc, char* argv[])
 {
@@ -127,8 +132,79 @@ void readInputFile(struct person **st_person)
 
 void processSimulationSequential(struct person **st_person)
 {
+    // we consider on simulation time 0 that everyone "spawns" and no one gets infected by it's neighbour.
+    // update location, compute next status, set current status and increment simulation time.
+
     for (int i = 0; i < TOTAL_SIMULATION_TIME; i++)
     {
-        
+        updateLocationSequential(st_person);
+
+        computeNextStatusSequential(st_person);
+
+        setCurrentStatusSequential(st_person);
+
+        i++;
     }
 }
+
+void updateLocationSequential(struct person **st_person)
+{
+    for (int i = 0; i < PEOPLE_COUNT; i++)
+    {
+        computeLocation(&(*st_person)[i]);
+    }
+}
+
+void computeLocation(struct person *person)
+{
+    switch (person->pattern_direction)
+    {
+    case 0: // N -> y++
+        person->y += person->pattern_amplitude;
+        break;
+    case 1: // S -> y--
+        person->y -= person->pattern_amplitude;
+        break;
+    case 2: // E -> x++
+        person->x += person->pattern_amplitude;
+        break;
+    case 3: // W -> x--
+        person->x -= person->pattern_amplitude;
+        break;
+    default:
+        printf("invalid pattern direction\n");
+        exit(1);
+    }
+
+    if (person->x < 0)
+    {
+        // x out of bounds because of W direction, switch to E
+        person->x = 0;
+        person->pattern_direction = 2;
+    }
+    else if (person->x > MAX_X_COORD)
+    {
+        // x out of bounds because of E direction, switch to W
+        person->x = MAX_X_COORD;
+        person->pattern_direction = 3;
+    }
+
+    if (person->y < 0)
+    {
+        // y out of bounds because of S direction, switch to N
+        person->y = 0;
+        person->pattern_direction = 0;
+    }
+    else if (person->y > MAX_Y_COORD)
+    {
+        // y out of bounds because of N direction, switch to S
+        person->y = MAX_Y_COORD;
+        person->pattern_direction = 1;
+    }
+}
+
+void computeNextStatusSequential(struct person **st_person)
+{
+    
+}
+void setCurrentStatusSequential(struct person **st_person);
