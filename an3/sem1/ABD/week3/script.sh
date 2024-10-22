@@ -7,32 +7,48 @@ USER="root"
 PASSWORD="my-secret-pw"
 HOST="localhost"
 
+# Number of rows per batch insert
+BATCH_SIZE=5000
+TOTAL_ROWS=1000000
+
 # Function to generate random names
 generate_random_name() {
   local NAMES=("Alice" "Bob" "Charlie" "David" "Eve" "Frank" "Grace" "Hank" "Ivy" "John")
   echo "${NAMES[$RANDOM % ${#NAMES[@]}]}"
 }
 
-# Insert records into the MySQL table
-insert_records() {
-  echo "Inserting 1 million records into the table '$TABLE_NAME'..."
+# Generate records in batches and insert them in bulk
+insert_records_in_batches() {
+  echo "Inserting $TOTAL_ROWS records into the table '$TABLE_NAME' in batches of $BATCH_SIZE..."
 
-  for i in {1..1000000}; do
-    # Generate random name and age
-    NAME=$(generate_random_name)
-    AGE=$((RANDOM % 50 + 18)) # Random age between 18 and 67
+  for ((start=1; start<=TOTAL_ROWS; start+=BATCH_SIZE)); do
+    SQL="INSERT INTO $TABLE_NAME (name, age) VALUES "
+    # Generate batch of records
+    for ((i=0; i<BATCH_SIZE && start+i<=TOTAL_ROWS; i++)); do
+      NAME=$(generate_random_name)
+      AGE=$((RANDOM % 50 + 18)) # Random age between 18 and 67
 
-    # Insert into MySQL table
-    mysql -h $HOST -u $USER -p$PASSWORD $DB_NAME -e \
-    "INSERT INTO $TABLE_NAME (name, age) VALUES ('$NAME', $AGE);" > /dev/null 2>&1
+      # Add the record to the SQL statement
+      SQL+="('$NAME', $AGE)"
+      # Add comma for all except the last record of the batch
+      if (( i < BATCH_SIZE - 1 && start + i < TOTAL_ROWS )); then
+        SQL+=", "
+      fi
+    done
 
-    # Show progress every 10000 records
-    if (( $i % 10000 == 0 )); then
-      echo "Inserted $i records..."
+    # Finalize the batch insert SQL
+    SQL+=";"
+
+    # Execute the SQL for the current batch
+    mysql -h $HOST -u $USER -p$PASSWORD $DB_NAME -e "$SQL" 2>> error.log
+
+    # Show progress every 100,000 records
+    if (( start % 100000 == 1 )); then
+      echo "Inserted $((start + BATCH_SIZE - 1)) records..."
     fi
   done
 
-  echo "Completed inserting 1 million records!"
+  echo "Completed inserting $TOTAL_ROWS records!"
 }
 
 # Check if table exists, if not create it
@@ -55,4 +71,4 @@ create_table_if_not_exists() {
 
 # Main script execution
 create_table_if_not_exists
-insert_records
+insert_records_in_batches
