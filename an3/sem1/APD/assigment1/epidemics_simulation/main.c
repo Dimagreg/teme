@@ -290,14 +290,19 @@ void computeNextStatusSequential(struct person **st_person)
 
 void computePersonNextStatus(struct person *person)
 {
-    //compute if effects expired
-    if (person->effect_time_left == 0)
+    //compute if effects expired and person is not susceptible (no effects)
+    if (person->effect_time_left == 0 && person->current_status != 1)
     {
         switch (person->current_status)
         {
             case 0: //infection expired -> make immune
                 person->current_status = 2;
                 person->effect_time_left = IMMUNE_DURATION;
+                break;
+            
+            case 2: //immunity expired -> make susceptible
+                person->current_status = 1;
+                break;
         }
     }
 
