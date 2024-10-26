@@ -40,20 +40,39 @@ struct person
     int infected_times; // how many times a person got infected
 };
 
+struct threadArgs
+{
+    struct person **st_person;
+    int start;
+    int end;
+};
+
+// Barrier for parallel simulation
+pthread_barrier_t barrier;
+
+// Mutex and condition variable for ZONE reset
+pthread_mutex_t resetZoneMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t resetZoneCond = PTHREAD_COND_INITIALIZER;
+int isResetZoneCalled = 0;
+
 void readArguments(char *argv[]);
 void readInputFile(struct person **st_person);
 void setZone(struct person *person);
 void initPersonEffect(struct person *person);
 void processSimulationSequential(struct person **st_person);
 void resetZone();
-void decrementEffectTimeSequential(struct person **st_person);
-void updateLocationSequential(struct person **st_person);
+void resetZoneParallel();
+void decrementEffectTime(struct person **st_person, int start, int end);
+void updateLocation(struct person **st_person, int start, int end);
 void computeLocation(struct person *person);
 void computeZoneSequential(struct person *person);
-void computeNextStatusSequential(struct person **st_person);
+void computeNextStatus(struct person **st_person, int start, int end);
 void computePersonNextStatus(struct person *person);
+void processSimulationParallel(struct person **st_person);
+void *threadProcessSimulationParallel(void *args);
 void printDebug(int simulation_time, struct person **st_person);
-void writeOutputFile(char *filename, char *postfix, struct person *st_person);
+char *writeOutputFile(char *filename, char *postfix, struct person *st_person);
+void compareFiles(char *file1, char *file2);
 // void setCurrentStatusSequential(struct person **st_person);
 
 int main(int argc, char* argv[])
@@ -71,6 +90,13 @@ int main(int argc, char* argv[])
 
     readInputFile(&st_person);
 
+    // avoid threads conflict with diving the people
+    if (PEOPLE_COUNT % Thread_count != 0)
+    {
+        printf("PEOPLE_COUNT must be divisible by Thread_count\n");
+        exit(1);
+    }
+
     clock_gettime(CLOCK_MONOTONIC, &start); 
     processSimulationSequential(&st_person);
     clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -78,9 +104,9 @@ int main(int argc, char* argv[])
     elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
-    printf("Elapsed time for Sequential simulation: %f\ns", elapsed);
+    printf("Elapsed time for Sequential simulation: %fs\n", elapsed);
 
-    writeOutputFile(argv[2], "_serial_out.txt", st_person);
+    char *outputFile_serial = writeOutputFile(argv[2], "_serial_out.txt", st_person);
 
     readInputFile(&st_person);
 
@@ -91,9 +117,19 @@ int main(int argc, char* argv[])
     elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
-    printf("Elapsed time for Parallel simulation: %f\ns", elapsed);
+    printf("Elapsed time for Parallel simulation: %fs\n", elapsed);
 
-    writeOutputFile(argv[2], "_parallel_out.txt", st_person);
+    char *outputFile_parallel = writeOutputFile(argv[2], "_parallel_out.txt", st_person);
+
+    compareFiles(outputFile_serial, outputFile_parallel);
+
+    free(st_person);
+
+    for (int i = 0; i < MAX_X_COORD; i++)
+    {
+        free(ZONE[i]);
+    }
+    free(ZONE);
 
     return 0;
 }
@@ -181,9 +217,9 @@ void readInputFile(struct person **st_person)
         exit(1);
     }
 
-    printf("MAX_X_COORD: %d, MAX_Y_COORD: %d, PEOPLE_COUNT: %d\n", MAX_X_COORD, MAX_Y_COORD, PEOPLE_COUNT);
-
-    printf("reading people\n");
+    #ifdef DEBUG
+        printf("MAX_X_COORD: %d, MAX_Y_COORD: %d, PEOPLE_COUNT: %d\n", MAX_X_COORD, MAX_Y_COORD, PEOPLE_COUNT);
+    #endif
 
     // read people from file, init spawning ZONE and effect duration
     for (int i = 0; i < PEOPLE_COUNT; i++)
@@ -199,7 +235,6 @@ void readInputFile(struct person **st_person)
 
         initPersonEffect(&(*st_person)[i]);
     }
-    printf("done reading people\n");
 
     fclose(file);
 }
@@ -243,27 +278,30 @@ void processSimulationSequential(struct person **st_person)
     // Simulation for sequential processing of each person.
 
     // at spawn time 0, if the person spawns with infected -> give him infection. (c'est la vie)
-    computeNextStatusSequential(st_person);
+    computeNextStatus(st_person, 0, PEOPLE_COUNT);
 
     for (int i = 1; i <= TOTAL_SIMULATION_TIME; i++)
     {   
-        printf("simulation time %d\n", i);
+        #ifdef DEBUG
+            printf("simulation time %d\n", i);
+        #endif
 
         // reset ZONE for each simulation time
         resetZone();
 
         // update location of each person
-        updateLocationSequential(st_person);
+        updateLocation(st_person, 0, PEOPLE_COUNT);
 
         // decrement effect time for each person
-        decrementEffectTimeSequential(st_person);
+        decrementEffectTime(st_person, 0, PEOPLE_COUNT);
 
         // compute status for next simulation time
-        computeNextStatusSequential(st_person);
+        computeNextStatus(st_person, 0, PEOPLE_COUNT);
 
         // setCurrentStatusSequential(st_person);
 
         #ifdef DEBUG
+            printf("debug for sequential simulation\n");
             printDebug(i, st_person);
         #endif
     }
@@ -275,8 +313,8 @@ void printDebug(int simulation_time, struct person **st_person)
 
     for (int i = 0; i < PEOPLE_COUNT; i++)
     {
-        printf("personId: %d, x: %d, y: %d, current_status: %d, effect_time_left: %d, infected_times: %d\n",
-            (*st_person)[i].personId, (*st_person)[i].x, (*st_person)[i].y, (*st_person)[i].current_status, (*st_person)[i].effect_time_left, (*st_person)[i].infected_times);
+        printf("personId: %d, x: %d, y: %d, current_status: %d, effect_time_left: %d, infected_times: %d, direction: %d, amplitude: %d\n",
+            (*st_person)[i].personId, (*st_person)[i].x, (*st_person)[i].y, (*st_person)[i].current_status, (*st_person)[i].effect_time_left, (*st_person)[i].infected_times, (*st_person)[i].pattern_direction, (*st_person)[i].pattern_amplitude);
     }
 }      
 
@@ -291,9 +329,9 @@ void resetZone()
     }
 }
 
-void decrementEffectTimeSequential(struct person **st_person)
+void decrementEffectTime(struct person **st_person, int start, int end)
 {
-    for (int i = 0; i < PEOPLE_COUNT; i++)
+    for (int i = start; i < end; i++)
     {
         if ((*st_person)[i].effect_time_left > 0)
         {
@@ -302,31 +340,32 @@ void decrementEffectTimeSequential(struct person **st_person)
     }
 }
 
-void updateLocationSequential(struct person **st_person)
+void updateLocation(struct person **st_person, int start, int end)
 {
-    for (int i = 0; i < PEOPLE_COUNT; i++)
+    for (int i = start; i < end; i++)
     {
         computeLocation(&(*st_person)[i]);
     }
 }
 void computeLocation(struct person *person)
 {
+    // ROWS are X, COLS are Y
     switch (person->pattern_direction)
     {
-    case 0: // N -> y++
-        person->y += person->pattern_amplitude;
+    case 0: // N -> x--
+        person->x -= person->pattern_amplitude;
         break;
 
-    case 1: // S -> y--
-        person->y -= person->pattern_amplitude;
-        break;
-
-    case 2: // E -> x++
+    case 1: // S -> x++
         person->x += person->pattern_amplitude;
         break;
 
-    case 3: // W -> x--
-        person->x -= person->pattern_amplitude;
+    case 2: // E -> y++
+        person->y += person->pattern_amplitude;
+        break;
+
+    case 3: // W -> y--
+        person->y -= person->pattern_amplitude;
         break;
 
     default:
@@ -336,28 +375,28 @@ void computeLocation(struct person *person)
 
     if (person->x < 0)
     {
-        // x out of bounds because of W direction, switch to E
-        person->x = 0;
-        person->pattern_direction = 2;
+        // x out of bounds because of N direction, switch to S
+        person->x = abs(person->x); // using abs if amplitude made him take multiple steps and get him back in bounds keeping steps
+        person->pattern_direction = 1;
     }
     else if (person->x >= MAX_X_COORD)
     {
-        // x out of bounds because of E direction, switch to W
-        person->x = MAX_X_COORD - 1;
-        person->pattern_direction = 3;
+        // x out of bounds because of S direction, switch to N
+        person->x = MAX_X_COORD - (person->x - (MAX_X_COORD - 1)) - 1;
+        person->pattern_direction = 0;
     }
 
     if (person->y < 0)
     {
-        // y out of bounds because of S direction, switch to N
-        person->y = 0;
-        person->pattern_direction = 0;
+        // y out of bounds because of W direction, switch to E
+        person->y = abs(person->y);
+        person->pattern_direction = 2;
     }
     else if (person->y >= MAX_Y_COORD)
     {
-        // y out of bounds because of N direction, switch to S
-        person->y = MAX_Y_COORD - 1;
-        person->pattern_direction = 1;
+        // y out of bounds because of E direction, switch to W
+        person->y = MAX_Y_COORD - (person->y - (MAX_Y_COORD - 1)) - 1;
+        person->pattern_direction = 3;
     }
 
     // mark current zone based on status
@@ -365,9 +404,9 @@ void computeLocation(struct person *person)
 }
 
 
-void computeNextStatusSequential(struct person **st_person)
+void computeNextStatus(struct person **st_person, int start, int end)
 {
-    for (int i = 0; i < PEOPLE_COUNT; i++)
+    for (int i = start; i < end; i++)
     {
         computePersonNextStatus(&(*st_person)[i]);
     }
@@ -434,18 +473,21 @@ void computePersonNextStatus(struct person *person)
 void processSimulationParallel(struct person **st_person)
 {
     // Simulation for parallel processing of each person. People are divided by number of threads.
-
     pthread_t threads[Thread_count];
-    int ids[Thread_count];
 
-    pthread_barrier_t barrier_init;
+    pthread_barrier_init(&barrier, NULL, Thread_count);
+    pthread_mutex_init(&resetZoneMutex, NULL);
+    pthread_cond_init(&resetZoneCond, NULL);
 
-    pthread_barrier_init(&barrier_init, NULL, Thread_count);
+     struct threadArgs threadData[Thread_count];
 
     for (int i = 0; i < Thread_count; i++)
     {
-        ids[i]=i;
-        pthread_create(&threads[i], NULL, threadProcessSimulationParallel, (void *)&ids[i]);
+        threadData[i].st_person = st_person;
+        threadData[i].start = i * (PEOPLE_COUNT / Thread_count);
+        threadData[i].end = (i + 1) * (PEOPLE_COUNT / Thread_count);
+
+        pthread_create(&threads[i], NULL, threadProcessSimulationParallel, (void *)&threadData[i]);
     }
 
     for (int i = 0; i < Thread_count; i++)
@@ -453,47 +495,104 @@ void processSimulationParallel(struct person **st_person)
         pthread_join(threads[i], NULL);
     }
 
-    pthread_barrier_destroy(&barrier_init);
+    pthread_mutex_destroy(&resetZoneMutex);
+    pthread_cond_destroy(&resetZoneCond);
+    pthread_barrier_destroy(&barrier);
 }
 
-void threadProcessSimulationParallel(struct person **st_person, int i, int j)
+void *threadProcessSimulationParallel(void *args)
 {
+    // Simulation for parallel processing of each person.
+    struct threadArgs *threadArgs = (struct threadArgs *)args;
+
+    struct person **st_person = threadArgs->st_person;
+    int start = threadArgs->start;
+    int end = threadArgs->end;
+
     // at spawn time 0, if the person spawns with infected -> give him infection. (c'est la vie)
-    computeNextStatusSequential(st_person);
+    computeNextStatus(st_person, start, end);
+    pthread_barrier_wait(&barrier);
 
     for (int i = 1; i <= TOTAL_SIMULATION_TIME; i++)
     {   
-        printf("simulation time %d\n", i);
+        #ifdef DEBUG
+            printf("simulation time %d\n", i);
+        #endif
 
         // reset ZONE for each simulation time
-        resetZone();
+        resetZoneParallel();
+        pthread_barrier_wait(&barrier);
 
         // update location of each person
-        updateLocationSequential(st_person);
+        updateLocation(st_person, start, end);
+        pthread_barrier_wait(&barrier);
 
         // decrement effect time for each person
-        decrementEffectTimeSequential(st_person);
+        decrementEffectTime(st_person, start, end);
+        pthread_barrier_wait(&barrier);
 
         // compute status for next simulation time
-        computeNextStatusSequential(st_person);
+        computeNextStatus(st_person, start, end);
+        pthread_barrier_wait(&barrier);
 
         // setCurrentStatusSequential(st_person);
 
         #ifdef DEBUG
+            printf("debug for parallel simulation\n");
             printDebug(i, st_person);
         #endif
+
+        // set flag to reset ZONE for next simulation time
+        pthread_mutex_lock(&resetZoneMutex);
+        isResetZoneCalled = 0;
+        pthread_mutex_unlock(&resetZoneMutex);
     }
+
+    pthread_exit(NULL);
+}
+
+void resetZoneParallel()
+{
+    // make sure it is called by one thread only per simulation time
+    pthread_mutex_lock(&resetZoneMutex);
+
+    if (!isResetZoneCalled)
+    {
+        resetZone();
+
+        isResetZoneCalled = 1;
+
+        pthread_cond_broadcast(&resetZoneCond);
+    }
+    else
+    {
+        while (!isResetZoneCalled)
+        {
+            pthread_cond_wait(&resetZoneCond, &resetZoneMutex);
+        }
+    }
+
+    pthread_mutex_unlock(&resetZoneMutex);
 }
 
  
-void writeOutputFile(char *filename, char *postfix, struct person *st_person)
+char *writeOutputFile(char *filename, char *postfix, struct person *st_person)
 {
     char *original_name = strtok(filename, ".");
-    char finalName[256];
 
-    snprintf(finalName, sizeof(finalName), "%s%s", original_name, postfix);
+    int len = strlen(original_name) + strlen(postfix) + 1;
 
-    FILE *file = fopen(finalName, "w");
+    char *finalNameOutput = malloc(len);
+
+    if (!finalNameOutput)
+    {
+        perror(NULL);
+        exit(1);
+    }
+
+    snprintf(finalNameOutput, len, "%s%s", original_name, postfix);
+
+    FILE *file = fopen(finalNameOutput, "w");
 
     if (!file)
     {
@@ -508,4 +607,36 @@ void writeOutputFile(char *filename, char *postfix, struct person *st_person)
     }
 
     fclose(file);
+
+    return finalNameOutput;
+}
+
+void compareFiles(char *file1, char *file2)
+{
+    FILE *f1 = fopen(file1, "rb");
+    FILE *f2 = fopen(file2, "rb");
+
+    if (!f1 || !f2)
+    {
+        perror("Cannot open files for comparison");
+        exit(1);
+    }
+
+    fseek(f1, 0, SEEK_END);
+    fseek(f2, 0, SEEK_END);
+
+    long size1 = ftell(f1);
+    long size2 = ftell(f2);
+    
+    fclose(f1);
+    fclose(f2);
+
+    if (size1 != size2)
+    {
+        printf("Serial and Parallel results are not same\n");
+    }
+    else
+    {
+        printf("Serial and Parallel results are same\n");
+    }
 }
