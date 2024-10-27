@@ -1,0 +1,129 @@
+HP ProDesk 600 G3 DM
+Intel® Core™ i5-6500T × 4 Cores
+16.0 GiB RAM
+
+./prog 100 epidemics1M.txt 2
+
+Elapsed time for Sequential simulation: 9.373317s
+Elapsed time for Parallel simulation: 6.051867s
+
+./prog 100 epidemics1M.txt 4
+
+Elapsed time for Sequential simulation: 9.232785s
+Elapsed time for Parallel simulation: 5.819720s
+
+./prog 100 epidemics1M.txt 8
+
+Elapsed time for Sequential simulation: 9.276301s
+Elapsed time for Parallel simulation: 9.126495s
+
+./prog 100 epidemics1M.txt 16
+
+Elapsed time for Sequential simulation: 9.188210s
+Elapsed time for Parallel simulation: 15.612552s
+
+./prog 1000 epidemics1M.txt 2
+Elapsed time for Sequential simulation: 92.068982s
+Elapsed time for Parallel simulation: 60.501942s
+
+./prog_parallel 1000 epidemics1M.txt 4
+Elapsed time for Parallel simulation: 57.461442s
+
+./prog_parallel 1000 epidemics1M.txt 8
+Elapsed time for Parallel simulation: 90.247565s
+
+./prog 2000 epidemics1M.txt 2
+Elapsed time for Sequential simulation: 182.967097s
+Elapsed time for Parallel simulation: 120.956368s
+
+./prog_parallel 2000 epidemics1M.txt 4
+Elapsed time for Parallel simulation: 114.968710s
+
+./prog_parallel 2000 epidemics1M.txt 8
+Elapsed time for Parallel simulation: 181.370418s
+
+./prog 5000 epidemics1M.txt 2
+Elapsed time for Sequential simulation: 456.305477s
+Elapsed time for Parallel simulation: 306.011931s
+
+./prog_parallel 5000 epidemics1M.txt 4
+Elapsed time for Parallel simulation: 288.369658s
+
+./prog_parallel 5000 epidemics1M.txt 8
+Elapsed time for Parallel simulation: 451.267819s
+
+./prog 100 epidemics2M.txt 2
+Elapsed time for Sequential simulation: 16.372401s
+Elapsed time for Parallel simulation: 9.922548s
+
+./prog_parallel 100 epidemics2M.txt 4
+Elapsed time for Parallel simulation: 8.005918s
+./prog_parallel 100 epidemics2M.txt 8
+Elapsed time for Parallel simulation: 11.412466s
+
+./prog 1000 epidemics2M.txt 2
+Elapsed time for Sequential simulation: 172.492607s
+Elapsed time for Parallel simulation: 104.057285s
+
+./prog_parallel 1000 epidemics2M.txt 4
+Elapsed time for Parallel simulation: 82.915960s
+
+./prog_parallel 1000 epidemics2M.txt 8
+Elapsed time for Parallel simulation: 116.005608s
+
+./prog 2000 epidemics2M.txt 2
+Elapsed time for Sequential simulation: 349.104012s
+Elapsed time for Parallel simulation: 210.326735s
+
+./prog_parallel 2000 epidemics2M.txt 4
+Elapsed time for Parallel simulation: 167.024971s
+
+./prog_parallel 2000 epidemics2M.txt 8
+Elapsed time for Parallel simulation: 233.245397s
+
+./prog 5000 epidemics2M.txt 2
+Elapsed time for Sequential simulation: 878.230785s
+Elapsed time for Parallel simulation: 527.774491s
+
+./prog_parallel 5000 epidemics2M.txt 4
+Elapsed time for Parallel simulation: 420.401291s
+
+./prog_parallel 5000 epidemics2M.txt 8
+Elapsed time for Parallel simulation: 587.569187s
+
+./prog 100 epidemics10M.txt 2
+Elapsed time for Sequential simulation: 86.752206s
+Elapsed time for Parallel simulation: 51.295660s
+
+./prog_parallel 100 epidemics2M.txt 4
+Elapsed time for Parallel simulation: 8.103104s
+
+./prog_parallel 100 epidemics2M.txt 8
+Elapsed time for Parallel simulation: 11.276617s
+
+./prog 1000 epidemics10M.txt 2
+Elapsed time for Sequential simulation: 912.464553s
+Elapsed time for Parallel simulation: 532.640223s
+
+1000, 4
+Elapsed time for Parallel simulation: 83.076803s
+1000, 8
+Elapsed time for Parallel simulation: 114.668121s
+
+2000, 2
+Elapsed time for Sequential simulation: 342.494982s
+Elapsed time for Parallel simulation: 207.050692s
+2000, 4
+Elapsed time for Parallel simulation: 165.103876s
+2000, 8
+Elapsed time for Parallel simulation: 230.746967s
+
+5000, 2
+Elapsed time for Sequential simulation: 860.919548s
+Elapsed time for Parallel simulation: 518.541693s
+5000, 4
+Elapsed time for Parallel simulation: 414.102158s
+5000, 8
+Elapsed time for Parallel simulation: 580.279694s
+
+
