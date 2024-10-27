@@ -15,7 +15,7 @@ VERSION 2: Each thread works with a local variable lcount and at the end
 merges its local result into the global counter
 */
 
-#define NELEM 50000000
+#define NELEM 10000000
 int a[NELEM];
 int x = 3;
 int count; // how many times appears x in array a?

@@ -1,0 +1,13 @@
+Time for performance_count1: 0.193754s
+
+Time for performance_count2: 0.003585s, Speedup: 54.04
+
+Time for performance_count3: 0.012834, Speedup: 15.09
+
+Time for performance_count4, padding 60: 0.003493, Speedup: 55.46
+
+Time for performance_count4, padding 30: 0.005705, Speedup: 33.96
+
+Time for performance_count4, padding 90: 0.004078s, Speedup: 47.51
+
+By performing experiments of changing value for padding size - the most optimal solution is 60-64 for reaching the maximum performance.

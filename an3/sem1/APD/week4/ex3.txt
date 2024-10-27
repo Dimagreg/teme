@@ -1,0 +1,65 @@
+Results for performance_pth_mat_vect.c for Intel I7-10850H 2.70Ghz, 6 cores, 16GB RAM.
+
+8000x8000:
+Serial time =0.161276s
+Parallel time =0.106092s
+Number of parallel threads was 2
+Measured Speedup=1.520150
+
+Serial time =0.161328s
+Parallel time =0.042426s
+Number of parallel threads was 4
+Measured Speedup=3.802531
+
+Serial time =0.160074s
+Parallel time =0.033830s
+Number of parallel threads was 8
+Measured Speedup=4.731728
+
+8x8000000 (without better solution):
+Serial time =0.151897s
+Parallel time =0.124558s
+Number of parallel threads was 2
+Measured Speedup=1.219486
+
+Serial time =0.170010s
+Parallel time =0.168461s
+Number of parallel threads was 4
+Measured Speedup=1.009198
+
+Serial time =0.157822s
+Parallel time =0.147915s
+Number of parallel threads was 8
+Measured Speedup=1.066976
+
+8x8000000 (with better solution):
+Serial time =0.167036s
+Parallel time =0.083069s
+Number of parallel threads was 2
+Measured Speedup=2.010812
+
+Serial time =0.169855s
+Parallel time =0.056583s
+Number of parallel threads was 4
+Measured Speedup=3.001900
+
+Serial time =0.172579s
+Parallel time =0.033068s
+Number of parallel threads was 8
+Measured Speedup=5.218837
+
+8000000x8:
+Serial time =0.191048s
+Parallel time =0.108355s
+Number of parallel threads was 2
+Measured Speedup=1.763166
+
+Serial time =0.205141s
+Parallel time =0.059196s
+Number of parallel threads was 4
+Measured Speedup=3.465465
+
+Serial time =0.232117s
+Parallel time =0.060025s
+Number of parallel threads was 8
+Measured Speedup=3.866997

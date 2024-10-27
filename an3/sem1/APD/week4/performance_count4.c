@@ -18,14 +18,14 @@ The array elements are padded such that each array element is on a different cac
 line to avoid performance drop because the False Sharing problem!
 */
 
-#define NELEM 50000000
+#define NELEM 10000000
 int a[NELEM];
 int x = 3;
 
 #define N_THREADS 8
 int elem_per_thread = NELEM / N_THREADS;
 
-#define PADDINGSIZE 60
+#define PADDINGSIZE 64
 
 struct padded_int
 {

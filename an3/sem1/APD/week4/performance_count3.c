@@ -18,7 +18,7 @@ one entry in this array of conteres.
 This version illustrates the effect of FALSE SHARING on performance
 */
 
-#define NELEM 50000000
+#define NELEM 10000000
 int a[NELEM];
 int x = 3;
 
