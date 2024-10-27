@@ -91,19 +91,52 @@ Elapsed time for Parallel simulation: 420.401291s
 ./prog_parallel 5000 epidemics2M.txt 8
 Elapsed time for Parallel simulation: 587.569187s
 
+10 MILLION:
 ./prog 100 epidemics10M.txt 2
 Elapsed time for Sequential simulation: 86.752206s
 Elapsed time for Parallel simulation: 51.295660s
+
+100, 4
+Elapsed time for Parallel simulation: 42.900345s
+100, 8
+Elapsed time for Parallel simulation: 51.547127s
+1000, 4
+Elapsed time for Parallel simulation: 401.694527s
+1000, 8
+Elapsed time for Parallel simulation: 530.700599s
+2000, 2
+Elapsed time for Sequential simulation: 1862.969857s
+Elapsed time for Parallel simulation: 1071.586960s
+
+2000, 4
+Elapsed time for Parallel simulation: 816.914887s
+2000, 8
+Elapsed time for Parallel simulation: 1065.877847s
+5000, 2
+Elapsed time for Sequential simulation: 4499.180693s
+Elapsed time for Parallel simulation: 2637.788622s
+Serial and Parallel results are same
+5000, 4
+Elapsed time for Parallel simulation: 1997.226803s
+5000, 8
+Elapsed time for Parallel simulation: 2660.680051s
+
+
+
+
+
+
+
 
 ./prog_parallel 100 epidemics2M.txt 4
 Elapsed time for Parallel simulation: 8.103104s
 
 ./prog_parallel 100 epidemics2M.txt 8
 Elapsed time for Parallel simulation: 11.276617s
-
 ./prog 1000 epidemics10M.txt 2
 Elapsed time for Sequential simulation: 912.464553s
 Elapsed time for Parallel simulation: 532.640223s
+
 
 1000, 4
 Elapsed time for Parallel simulation: 83.076803s
