@@ -2,6 +2,11 @@ HP ProDesk 600 G3 DM
 Intel® Core™ i5-6500T × 4 Cores
 16.0 GiB RAM
 
+SPEEDUP FOR:
+2 Threads: 1.54, 1.52, 1.49, 1.70 (10M)
+4 Threads: 1.61, 1.58, 2.02, 2.25 (10M)
+8 Threads: 1.02, 1.67 (10M)
+
 ./prog 100 epidemics1M.txt 2
 
 Elapsed time for Sequential simulation: 9.373317s
@@ -100,6 +105,11 @@ Elapsed time for Parallel simulation: 51.295660s
 Elapsed time for Parallel simulation: 42.900345s
 100, 8
 Elapsed time for Parallel simulation: 51.547127s
+
+./prog 1000 epidemics10M.txt 2
+Elapsed time for Sequential simulation: 912.464553s
+Elapsed time for Parallel simulation: 532.640223s
+
 1000, 4
 Elapsed time for Parallel simulation: 401.694527s
 1000, 8
@@ -133,9 +143,6 @@ Elapsed time for Parallel simulation: 8.103104s
 
 ./prog_parallel 100 epidemics2M.txt 8
 Elapsed time for Parallel simulation: 11.276617s
-./prog 1000 epidemics10M.txt 2
-Elapsed time for Sequential simulation: 912.464553s
-Elapsed time for Parallel simulation: 532.640223s
 
 
 1000, 4

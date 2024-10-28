@@ -73,7 +73,6 @@ void *threadProcessSimulationParallel(void *args);
 void printDebug(int simulation_time, struct person **st_person);
 char *writeOutputFile(char *filename, char *postfix, struct person *st_person);
 void compareFiles(char *file1, char *file2);
-// void setCurrentStatusSequential(struct person **st_person);
 
 int main(int argc, char* argv[])
 {
@@ -446,29 +445,6 @@ void computePersonNextStatus(struct person *person)
         // noop
     }
 }
-
-// void setCurrentStatusSequential(struct person **st_person)
-// {
-//     for (int i = 0; i < PEOPLE_COUNT; i++)
-//     {
-//         switch ((*st_person)[i].next_status)
-//         {
-//             case 0: // infected
-//                 (*st_person)[i].current_status = 0;
-//                 (*st_person)[i].effect_time_left = INFECTED_DURATION;
-//                 break;
-
-//             case 1: // susceptible
-//                 (*st_person)[i].current_status = 1;
-//                 break;
-
-//             case 2: // immune
-//                 (*st_person)[i].current_status = 2;
-//                 (*st_person)[i].effect_time_left = IMMUNE_DURATION;
-//                 break;
-//         }
-//     }
-// }
 
 void processSimulationParallel(struct person **st_person)
 {
