@@ -106,6 +106,14 @@ The hardware used for this experiment is following:
 
 ### Execution Time
 After computing the input data for 20K, 1M, 2M, 10M individuals across 100, 1000, 2000, 5000 time units following results can be seen:
+
+- **20,000 People**
+
+![20K, 100](img/20K,100.png)
+![20K, 1000](img/20K,1000.png)
+![20K, 2000](img/20K,2000.png)
+![20K, 5000](img/20K,5000.png)
+
 - **1 Million People**
 
 ![1M, 100](img/1M,100.png)
@@ -129,11 +137,12 @@ After computing the input data for 20K, 1M, 2M, 10M individuals across 100, 1000
 
 ### Speedup
 - An average speedup can be considered:
-    - **1.52** for 2 threads (max 1.70 for 10M data set)
-    - **1.68** for 4 threads (max 2.25 for 10M data set)
-    - **1.02** for 8 threads (max 1.67 for 10M data set)
+    - **1.52** for 2 threads (max **1.70** for 10M data set, min **0.78** for 20K)
+    - **1.68** for 4 threads (max **2.25** for 10M data set, min **0.49** for 20K)
+    - **1.02** for 8 threads (max **1.67** for 10M data set, min **0.27!** for 20K)
 
 ### Observations
 
-Given the used hardware, processor with 4 cores, we can conclude that the maximum performance can be achieved using 4 threads for this set of tasks. Using more threads than cores can unevenly distribute the tasks which can lead to poor performance compared to different value used for threads.
----
+Given the hardware configuration - a processor with 4 cores, we can conclude that optimal performance is achieved with 4 threads for this task set. Utilizing more threads than available cores can lead to an uneven distribution of tasks, resulting in diminished or even negative performance gains due to the overhead of managing excess threads. 
+
+Consequently, using thread counts that exceed the core count can lead to suboptimal speedups, as shown in the data.
