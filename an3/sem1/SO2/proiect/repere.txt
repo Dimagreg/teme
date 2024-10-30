@@ -1,0 +1,8 @@
+Clion remote execution: https://www.jetbrains.com/help/clion/remote-projects-support.html
+
+Raspberry PI OS in docker: https://github.com/lukechilds/dockerpi
+
+docker run -it -p 5022:5022 -v C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\SO2\proiect\raspberry_v:/sdcard lukechilds/dockerpi
+ssh pi@localhost -p 5022
+
+Raspberry PI OS in VM: https://www.howtogeek.com/run-a-raspberry-pi-in-virtualbox/
