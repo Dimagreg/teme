@@ -2,11 +2,11 @@ dosseg
 
 ; (2A - 3B)/5C -> catul si restul
 
-; A = 7
+; A = 6
 ; B = 1
 ; C = 1
-; cat = 2
-; rest = 1
+; cat = 1
+; rest = 4
 
 .model small
 
@@ -19,9 +19,11 @@ dosseg
     n1 DB "Introduceti primul numar: $"
     n2 DB "Introduceti al doilea numar: $"
     n3 DB "Introduceti al treilea numar: $"
+
     result_cat DB "Catul este: $"
     result_rest DB "Restul este: $"
-    result DB "00$"
+    rest db 0
+    cat db 0
 
 .code
 
@@ -29,17 +31,25 @@ new_line proc
     MOV AH, 2
     MOV DL, 10; ASCII code for new line
     INT 21h; DOS interrupt
-    ret; return
+    RET; RETurn
 new_line endp
+
+print_num proc
+    MOV AH, 2
+    MOV DL, AL
+    ADD DL, '0'
+    INT 21h
+    RET
+endp
 
 main proc
     MOV AX, @data; initialize data segment
-    MOV DS, AX; DS points to data segment
+    MOV DS, AX; DS poINTs to data segment
     
     ; read first number
     MOV AH, 9
     MOV DX, OFFSET n1; display message
-    INT 21h; DOS interrupt
+    INT 21h; DOS INTerrupt
     MOV AH, 1; read character from keyboard
     INT 21h; DOS interrupt
     SUB AL, 30h; convert ASCII to digit
@@ -52,7 +62,7 @@ main proc
     INT 21h; DOS interrupt
     MOV AH, 1
     INT 21h
-    SUB AL, 30h; convert ASCII to digit
+    SUB AL, '0'; convert ASCII to digit
     MOV B, AL
     CALL new_line
 
@@ -62,60 +72,59 @@ main proc
     INT 21h; DOS interrupt
     MOV AH, 1
     INT 21h
-    SUB AL, 30h; convert ASCII to digit
+    SUB AL, '0'; convert ASCII to digit
     MOV C, AL
     CALL new_line
 
-    ; calculate
+    ; (2A - 3B)/5C -> catul si restul
+
+    ; A = 7
+    ; B = 1
+    ; C = 1
+    ; cat = 2
+    ; rest = 1
+
     MOV AL, A
-    MOV BL, 2 
+    MOV BL, 2
     MUL BL
-    MOV DX, AX; (2 * A) -> DX
-    
+    MOV BL, AL ; BL = 2A
+
     MOV AL, B
-    MOV BL, 3
-    MUL BL;
-    SUB DX, AX; (2A - 3B) -> DX
+    MOV CL, 3   
+    MUL CL
+    MOV CL, AL ; CL = 3B
+
+    SUB BL, CL  ; BL = (2A - 3B)
 
     MOV AL, C
-    MOV BL, 5
-    MUL BL; 
-    MOV CX, AX; (5 * C) -> CX
+    MOV DL, 5
+    MUL DL
+    MOV DL, AL ; DL = 5C
 
-    MOV AX, DX
-    DIV CL; AX / CL, AL - cat, AH - rest
+    XOR AH, AH; clear AH
+    MOV AL, BL
+    DIV DL
 
-    ; MOV BL, AL; cat
-    ; MOV CL, DL; rest
+    MOV cat, AL
+    MOV rest, AH
 
-    MOV CL, AH;
-
-    ; afiseaza catul
-    MOV AH, 09h
-    MOV DX, OFFSET result_cat
-    INT 21h 
-
-    ; MOV AL, BL
-    ADD AL, '0'; convert digit to ASCII
-    MOV DL, AL; move AL to DL
-    MOV AH, 2
+    MOV AH, 9
+    MOV DX, OFFSET result_cat; display message
     INT 21h; DOS interrupt
 
+    MOV AL, cat
+    CALL print_num
     CALL new_line
 
-    ; afiseaza restul
-    MOV AH, 09h
-    MOV DX, OFFSET result_rest
-    INT 21h
-
-    MOV AL, CL
-    ADD AL, '0'; convert digit to ASCII
-    MOV DL, AL; move AL to DL
-    MOV AH, 2
+    MOV AH, 9
+    MOV DX, OFFSET result_rest; display message
     INT 21h; DOS interrupt
 
+    MOV AL, rest
+    CALL print_num
+    
     ; Exit program
-    MOV AH, 4Ch
+    MOV AH, 004Ch
     INT 21h
 main endp
 

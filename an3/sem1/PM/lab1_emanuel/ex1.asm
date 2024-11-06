@@ -1,16 +1,10 @@
 dosseg
 
-; (2A - 3B)/5C -> catul si restul
-
-; A = 7
-; B = 1
-; C = 1
-; cat = 2
-; rest = 1
+; A + B - C
 
 .model small
 
-.stack 1000
+.stack 100h; 100h = 256 bytes of stack space
 
 .data
     A DB 0
@@ -19,9 +13,7 @@ dosseg
     n1 DB "Introduceti primul numar: $"
     n2 DB "Introduceti al doilea numar: $"
     n3 DB "Introduceti al treilea numar: $"
-    result_cat DB "Catul este: $"
-    result_rest DB "Restul este: $"
-    result DB "00$"
+    result DB "Rezultatul este: $"
 
 .code
 
@@ -66,57 +58,24 @@ main proc
     MOV C, AL
     CALL new_line
 
-    ; calculate
-    MOV AL, A
-    MOV BL, 2 
-    MUL BL
-    MOV DX, AX; (2 * A) -> DX
-    
-    MOV AL, B
-    MOV BL, 3
-    MUL BL;
-    SUB DX, AX; (2A - 3B) -> DX
-
-    MOV AL, C
-    MOV BL, 5
-    MUL BL; 
-    MOV CX, AX; (5 * C) -> CX
-
-    MOV AX, DX
-    DIV CL; AX / CL, AL - cat, AH - rest
-
-    ; MOV BL, AL; cat
-    ; MOV CL, DL; rest
-
-    MOV CL, AH;
-
-    ; afiseaza catul
-    MOV AH, 09h
-    MOV DX, OFFSET result_cat
-    INT 21h 
-
-    ; MOV AL, BL
-    ADD AL, '0'; convert digit to ASCII
-    MOV DL, AL; move AL to DL
-    MOV AH, 2
+    ; print result message
+    MOV AH, 9
+    MOV DX, OFFSET result
     INT 21h; DOS interrupt
 
-    CALL new_line
+    ; calculate result
+    MOV AL, A; move A to AL
+    ADD AL, B; add B to AL
+    SUB AL, C; subtract C from AL
 
-    ; afiseaza restul
-    MOV AH, 09h
-    MOV DX, OFFSET result_rest
-    INT 21h
-
-    MOV AL, CL
-    ADD AL, '0'; convert digit to ASCII
-    MOV DL, AL; move AL to DL
+    ; print result
+    ADD AL, 30h; convert digit to ASCII
     MOV AH, 2
+    MOV DL, AL; move AL to DL
+    INT 21h; DOS interrupt
+    MOV AH, 4Ch; terminate program
     INT 21h; DOS interrupt
 
-    ; Exit program
-    MOV AH, 4Ch
-    INT 21h
 main endp
 
 end main
