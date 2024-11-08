@@ -12,12 +12,12 @@
 #include <bits/pthreadtypes.h>
 #include <omp.h>
 
-#define DEBUG 1
+// #define DEBUG 1
 #define INFECTED_DURATION 15 // simulation time a person is infected ( > 1)
 #define IMMUNE_DURATION 10 // simulation time a person is immune to being infected ( > 1)
 
 #define POLICY static
-#define CHUNK_SIZE 2
+#define CHUNK_SIZE 1
 
 int TOTAL_SIMULATION_TIME;
 char inputFileName[256];
@@ -89,13 +89,6 @@ int main(int argc, char* argv[])
 
     // Serial
     readInputFile(&st_person);
-
-    // avoid threads conflict with diving the people
-    if (PEOPLE_COUNT % Thread_count != 0)
-    {
-        printf("PEOPLE_COUNT must be divisible by Thread_count\n");
-        exit(1);
-    }
 
     clock_gettime(CLOCK_MONOTONIC, &start); 
     processSimulationSequential(&st_person);
@@ -478,11 +471,12 @@ void processSimulationParallel_V1(struct person **st_person)
     #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
     for (int i = 0; i < Thread_count; i++)
     {
-        printf("%d started\n", i);
-
         int start = i * (PEOPLE_COUNT / Thread_count);
-        int end = (i + 1) * (PEOPLE_COUNT / Thread_count);  
+        int end = (i == Thread_count - 1) ? PEOPLE_COUNT : (i + 1) * (PEOPLE_COUNT / Thread_count);
 
+        printf("V1 Thread %d processing range [%d, %d)\n", i, start, end);
+
+        // Each thread processes its assigned range of people
         threadProcessSimulationParallel(st_person, start, end);
     }
 }
@@ -495,8 +489,9 @@ void processSimulationParallel_V2(struct person **st_person)
     {
         int thread_id = omp_get_thread_num();
         int start = thread_id * (PEOPLE_COUNT / Thread_count);
-        int end = (thread_id + 1) * (PEOPLE_COUNT / Thread_count);
+        int end = (thread_id == Thread_count - 1) ? PEOPLE_COUNT : (thread_id + 1) * (PEOPLE_COUNT / Thread_count);
 
+        printf("V2 Thread %d processing range [%d, %d)\n", thread_id, start, end);
         threadProcessSimulationParallel(st_person, start, end);
     }
 }
