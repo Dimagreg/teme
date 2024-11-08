@@ -468,15 +468,13 @@ void processSimulationParallel_V1(struct person **st_person)
 {
     // Simulation for parallel processing of each person. People are divided by number of threads.
     // V1 - Parallel for with scheduling policy and chunksizes
-    #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
+    #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE) // reaches deadlock if CHUNK_SIZE != 1
     for (int i = 0; i < Thread_count; i++)
     {
         int start = i * (PEOPLE_COUNT / Thread_count);
         int end = (i == Thread_count - 1) ? PEOPLE_COUNT : (i + 1) * (PEOPLE_COUNT / Thread_count);
 
         printf("V1 Thread %d processing range [%d, %d)\n", i, start, end);
-
-        // Each thread processes its assigned range of people
         threadProcessSimulationParallel(st_person, start, end);
     }
 }
