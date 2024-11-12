@@ -16,8 +16,8 @@
 #define INFECTED_DURATION 15 // simulation time a person is infected ( > 1)
 #define IMMUNE_DURATION 10 // simulation time a person is immune to being infected ( > 1)
 
-#define POLICY static
-#define CHUNK_SIZE 125
+#define POLICY dynamic
+#define CHUNK_SIZE 100
 
 int TOTAL_SIMULATION_TIME;
 char inputFileName[256];
@@ -69,7 +69,7 @@ void computeNextStatus(struct person **st_person, int start, int end);
 void computePersonNextStatus(struct person *person);
 void processSimulationParallel_V1(struct person **st_person);
 void processSimulationParallel_V2(struct person **st_person);
-void *threadProcessSimulationParallel_V2(struct person **st_person, int start, int end);
+void threadProcessSimulationParallel_V2(struct person **st_person, int start, int end);
 void printDebug(int simulation_time, struct person **st_person);
 char *writeOutputFile(char *filename, char *postfix, struct person *st_person);
 int compareFiles(char *file1, char *file2, char *file3);
@@ -89,6 +89,8 @@ int main(int argc, char* argv[])
 
     // Serial
     readInputFile(&st_person);
+
+    printf("Simulation for %d people, Simulation duration: %d, Threads: %d, argv[0] = %s\n", PEOPLE_COUNT, TOTAL_SIMULATION_TIME, Thread_count, argv[0]);
 
     clock_gettime(CLOCK_MONOTONIC, &start); 
     processSimulationSequential(&st_person);
@@ -113,7 +115,7 @@ int main(int argc, char* argv[])
     elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
-    printf("Elapsed time for Omp1 simulation: %fs Speedup: %fs\n", elapsed, elapsed_serial / elapsed);
+    printf("Elapsed time for Omp1 simulation: %fs Speedup: %f\n", elapsed, elapsed_serial / elapsed);
 
     char *outputFile_parallel_v1 = writeOutputFile(argv[2], "_omp1_out.txt", st_person);
 
@@ -127,7 +129,7 @@ int main(int argc, char* argv[])
     elapsed = (finish.tv_sec - start.tv_sec);
     elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
-    printf("Elapsed time for Omp2 simulation: %fs Speedup: %fs\n", elapsed, elapsed_serial / elapsed);
+    printf("Elapsed time for Omp2 simulation: %fs Speedup: %f\n", elapsed, elapsed_serial / elapsed);
 
     char *outputFile_parallel_v2 = writeOutputFile(argv[2], "_omp2_out.txt", st_person);
 
@@ -470,7 +472,8 @@ void processSimulationParallel_V1(struct person **st_person)
 {
     // Simulation for parallel processing of each person.
     // V1 - Parallel for with scheduling policy and chunksizes
-    // this method will execute each action with omp parallel for.
+    // This method will execute each action with omp parallel for.
+    // It's surprisingly faster rather than sequential version tbh.
 
     #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
     for (int i = 0; i < PEOPLE_COUNT; i++)
@@ -522,16 +525,16 @@ void processSimulationParallel_V2(struct person **st_person)
     // V2 - Manual explicit data partitioning
     #pragma omp parallel num_threads(Thread_count)
     {
+        // fixed bug where I exit program if I can't divide people by threads :)
         int thread_id = omp_get_thread_num();
         int start = thread_id * (PEOPLE_COUNT / Thread_count);
-        int end = (thread_id == Thread_count - 1) ? PEOPLE_COUNT : (thread_id + 1) * (PEOPLE_COUNT / Thread_count);
+        int end = (thread_id == Thread_count - 1) ? PEOPLE_COUNT : (thread_id + 1) * (PEOPLE_COUNT / Thread_count); // gets the rest of people on last thread
 
-        printf("V2 Thread %d processing range [%d, %d)\n", thread_id, start, end);
         threadProcessSimulationParallel_V2(st_person, start, end);
     }
 }
 
-void *threadProcessSimulationParallel_V2(struct person **st_person, int start, int end)
+void threadProcessSimulationParallel_V2(struct person **st_person, int start, int end)
 {
     // Simulation for parallel processing of each person.
     // at spawn time 0, if the person spawns with infected -> give him infection. (c'est la vie)
