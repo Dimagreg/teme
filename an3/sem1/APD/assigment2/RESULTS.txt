@@ -1,0 +1,180 @@
+Simulation for 20000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 0.156764s
+Elapsed time for Omp1 simulation: 0.135307s Speedup: 1.158579
+Elapsed time for Omp2 simulation: 0.118931s Speedup: 1.318103
+Files have the same content
+Simulation for 20000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 0.734950s
+Elapsed time for Omp1 simulation: 0.582862s Speedup: 1.260934
+Elapsed time for Omp2 simulation: 0.509902s Speedup: 1.441355
+Files have the same content
+Simulation for 20000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 0.147002s
+Elapsed time for Omp1 simulation: 0.087797s Speedup: 1.674331
+Elapsed time for Omp2 simulation: 0.157914s Speedup: 0.930895
+Files have the same content
+Simulation for 20000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 0.683709s
+Elapsed time for Omp1 simulation: 0.481589s Speedup: 1.419696
+Elapsed time for Omp2 simulation: 0.459106s Speedup: 1.489218
+Files have the same content
+Simulation for 20000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_static_5000
+Elapsed time for Sequential simulation: 0.145382s
+Elapsed time for Omp1 simulation: 0.115659s Speedup: 1.256985
+Elapsed time for Omp2 simulation: 0.104874s Speedup: 1.386250
+Files have the same content
+Simulation for 20000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_static_5000
+Elapsed time for Sequential simulation: 0.682104s
+Elapsed time for Omp1 simulation: 0.560230s Speedup: 1.217543
+Elapsed time for Omp2 simulation: 0.506547s Speedup: 1.346576
+Files have the same content
+Simulation for 20000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_dynamic_5000
+Elapsed time for Sequential simulation: 0.153163s
+Elapsed time for Omp1 simulation: 0.117287s Speedup: 1.305882
+Elapsed time for Omp2 simulation: 0.101999s Speedup: 1.501619
+Files have the same content
+Simulation for 20000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_dynamic_5000
+Elapsed time for Sequential simulation: 0.683577s
+Elapsed time for Omp1 simulation: 0.565928s Speedup: 1.207886
+Elapsed time for Omp2 simulation: 0.491188s Speedup: 1.391679
+Files have the same content
+Simulation for 20000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_static_2500
+Elapsed time for Sequential simulation: 0.145850s
+Elapsed time for Omp1 simulation: 0.087522s Speedup: 1.666433
+Elapsed time for Omp2 simulation: 0.149826s Speedup: 0.973460
+Files have the same content
+Simulation for 20000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_static_2500
+Elapsed time for Sequential simulation: 0.697426s
+Elapsed time for Omp1 simulation: 0.476117s Speedup: 1.464820
+Elapsed time for Omp2 simulation: 0.469597s Speedup: 1.485159
+Files have the same content
+Simulation for 20000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_dynamic_2500
+Elapsed time for Sequential simulation: 0.144329s
+Elapsed time for Omp1 simulation: 0.089959s Speedup: 1.604382
+Elapsed time for Omp2 simulation: 0.165119s Speedup: 0.874092
+Files have the same content
+Simulation for 20000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_dynamic_2500
+Elapsed time for Sequential simulation: 0.704130s
+Elapsed time for Omp1 simulation: 0.514898s Speedup: 1.367512
+Elapsed time for Omp2 simulation: 0.478990s Speedup: 1.470032
+Files have the same content
+Simulation for 200000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 1.477071s
+Elapsed time for Omp1 simulation: 1.088982s Speedup: 1.356378
+Elapsed time for Omp2 simulation: 0.875779s Speedup: 1.686579
+Files have the same content
+Simulation for 200000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 7.512854s
+Elapsed time for Omp1 simulation: 5.450222s Speedup: 1.378449
+Elapsed time for Omp2 simulation: 4.412398s Speedup: 1.702669
+Files have the same content
+Simulation for 200000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 1.485764s
+Elapsed time for Omp1 simulation: 0.780009s Speedup: 1.904805
+Elapsed time for Omp2 simulation: 0.700239s Speedup: 2.121796
+Files have the same content
+Simulation for 200000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 7.502627s
+Elapsed time for Omp1 simulation: 3.486732s Speedup: 2.151765
+Elapsed time for Omp2 simulation: 3.091575s Speedup: 2.426798
+Files have the same content
+Simulation for 200000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_static_50000
+Elapsed time for Sequential simulation: 1.459050s
+Elapsed time for Omp1 simulation: 1.052702s Speedup: 1.386005
+Elapsed time for Omp2 simulation: 0.874441s Speedup: 1.668552
+Files have the same content
+Simulation for 200000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_static_50000
+Elapsed time for Sequential simulation: 7.484110s
+Elapsed time for Omp1 simulation: 5.283456s Speedup: 1.416518
+Elapsed time for Omp2 simulation: 4.402507s Speedup: 1.699966
+Files have the same content
+Simulation for 200000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_dynamic_50000
+Elapsed time for Sequential simulation: 1.477021s
+Elapsed time for Omp1 simulation: 1.054881s Speedup: 1.400178
+Elapsed time for Omp2 simulation: 1.002431s Speedup: 1.473439
+Files have the same content
+Simulation for 200000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_dynamic_50000
+Elapsed time for Sequential simulation: 7.505487s
+Elapsed time for Omp1 simulation: 5.282599s Speedup: 1.420794
+Elapsed time for Omp2 simulation: 4.432159s Speedup: 1.693415
+Files have the same content
+Simulation for 200000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_static_25000
+Elapsed time for Sequential simulation: 1.464556s
+Elapsed time for Omp1 simulation: 0.765078s Speedup: 1.914256
+Elapsed time for Omp2 simulation: 0.697932s Speedup: 2.098421
+Files have the same content
+Simulation for 200000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_static_25000
+Elapsed time for Sequential simulation: 7.472402s
+Elapsed time for Omp1 simulation: 3.404362s Speedup: 2.194949
+Elapsed time for Omp2 simulation: 3.156311s Speedup: 2.367448
+Files have the same content
+Simulation for 200000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_dynamic_25000
+Elapsed time for Sequential simulation: 1.471407s
+Elapsed time for Omp1 simulation: 0.734239s Speedup: 2.003990
+Elapsed time for Omp2 simulation: 0.692580s Speedup: 2.124529
+Files have the same content
+Simulation for 200000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_dynamic_25000
+Elapsed time for Sequential simulation: 7.467376s
+Elapsed time for Omp1 simulation: 3.471682s Speedup: 2.150939
+Elapsed time for Omp2 simulation: 3.106284s Speedup: 2.403958
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 8.864925s
+Elapsed time for Omp1 simulation: 6.309446s Speedup: 1.405024
+Elapsed time for Omp2 simulation: 5.104683s Speedup: 1.736626
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 44.808809s
+Elapsed time for Omp1 simulation: 31.654577s Speedup: 1.415555
+Elapsed time for Omp2 simulation: 25.598339s Speedup: 1.750458
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 8.805854s
+Elapsed time for Omp1 simulation: 3.758169s Speedup: 2.343123
+Elapsed time for Omp2 simulation: 3.236749s Speedup: 2.720586
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_static_100
+Elapsed time for Sequential simulation: 44.940072s
+Elapsed time for Omp1 simulation: 18.955246s Speedup: 2.370851
+Elapsed time for Omp2 simulation: 16.446660s Speedup: 2.732474
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_static_250000
+Elapsed time for Sequential simulation: 8.767673s
+Elapsed time for Omp1 simulation: 6.105707s Speedup: 1.435980
+Elapsed time for Omp2 simulation: 5.024647s Speedup: 1.744933
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_static_250000
+Elapsed time for Sequential simulation: 44.796576s
+Elapsed time for Omp1 simulation: 31.051311s Speedup: 1.442663
+Elapsed time for Omp2 simulation: 25.726313s Speedup: 1.741275
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 100, Threads: 2, argv[0] = ./prog_dynamic_250000
+Elapsed time for Sequential simulation: 8.784424s
+Elapsed time for Omp1 simulation: 6.120361s Speedup: 1.435279
+Elapsed time for Omp2 simulation: 5.035532s Speedup: 1.744488
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 500, Threads: 2, argv[0] = ./prog_dynamic_250000
+Elapsed time for Sequential simulation: 44.826772s
+Elapsed time for Omp1 simulation: 30.929578s Speedup: 1.449317
+Elapsed time for Omp2 simulation: 25.636995s Speedup: 1.748519
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_static_125000
+Elapsed time for Sequential simulation: 8.756591s
+Elapsed time for Omp1 simulation: 3.682420s Speedup: 2.377945
+Elapsed time for Omp2 simulation: 3.240090s Speedup: 2.702577
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_static_125000
+Elapsed time for Sequential simulation: 44.863953s
+Elapsed time for Omp1 simulation: 18.653021s Speedup: 2.405184
+Elapsed time for Omp2 simulation: 16.606587s Speedup: 2.701576
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 100, Threads: 4, argv[0] = ./prog_dynamic_125000
+Elapsed time for Sequential simulation: 8.809706s
+Elapsed time for Omp1 simulation: 3.677576s Speedup: 2.395520
+Elapsed time for Omp2 simulation: 3.259479s Speedup: 2.702796
+Files have the same content
+Simulation for 1000000 people, Simulation duration: 500, Threads: 4, argv[0] = ./prog_dynamic_125000
+Elapsed time for Sequential simulation: 44.652474s
+Elapsed time for Omp1 simulation: 18.598980s Speedup: 2.400802
+Elapsed time for Omp2 simulation: 16.665467s Speedup: 2.679341
+Files have the same content
