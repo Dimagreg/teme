@@ -12,12 +12,18 @@ void signalHandler(int signalNum)
     {
         printf("caught SIGUSR1\n");
     }
+
+    if (signalNum == SIGINT)
+    {
+        printf("caught SIGINT\n");
+    }
 }
 
 
 int main()
 {
     signal(SIGUSR1, signalHandler);
+    signal(SIGINT, signalHandler);
     
     // /bin/bash kill -10 {pid}
 
