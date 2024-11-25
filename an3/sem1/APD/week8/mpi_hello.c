@@ -30,7 +30,7 @@ int main(void) {
    char       greeting[MAX_STRING];  /* String storing message */
    int        comm_sz;               /* Number of processes    */
    int        my_rank;               /* My process rank        */
-   int a, b;
+   int a, b, sum;
 
    /* Start up MPI */
    MPI_Init(NULL, NULL); 
@@ -41,26 +41,28 @@ int main(void) {
    /* Get my rank among all the processes */
    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank); 
 
-   if (my_rank != 0) { 
-      /* Create message */
-      a = 2;
-      b = 4
+   if (my_rank == 1) { 
+      // Get message from process 0
+      MPI_Recv(&a, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(&b, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      
+      printf("a = %d from process %d\n", a, my_rank);
+      printf("b = %d from process %d\n", b, my_rank);
 
-      /* Send message to process 0 */
-      MPI_Send(&a, 1, MPI_INT, 0, 0,
-            MPI_COMM_WORLD); 
-      MPI_Send(&b, 1, MPI_INT, 0, 0,
-            MPI_COMM_WORLD);
+      sum = a + b;
+
+      MPI_Send(&sum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
    } else {  
-      /* Print my message */
-      printf("I am process %d of %d!\n", my_rank, comm_sz);
-      for (int q = 1; q < comm_sz; q++) {
-         /* Receive message from process q */
-         MPI_Recv(greeting, MAX_STRING, MPI_CHAR, q,
-            0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-         /* Print message from process q */
-         printf("%s\n", greeting);
-      } 
+      a = 2;
+      b = 4;
+
+      /* Send message to process 1 */
+      MPI_Send(&a, 1, MPI_INT, 1, 0, MPI_COMM_WORLD); 
+      MPI_Send(&b, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+
+      MPI_Recv(&sum, 1, MPI_INT, 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+      printf("sum = %d from process %d\n", sum, my_rank);
    }
 
    /* Shut down MPI */
