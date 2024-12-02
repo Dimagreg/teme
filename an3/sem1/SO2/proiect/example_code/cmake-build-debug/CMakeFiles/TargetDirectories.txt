@@ -1,0 +1,3 @@
+/tmp/tmp.kFm7e56Upv/cmake-build-debug/CMakeFiles/example_code.dir
+/tmp/tmp.kFm7e56Upv/cmake-build-debug/CMakeFiles/edit_cache.dir
+/tmp/tmp.kFm7e56Upv/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -3,6 +3,18 @@ Clion remote execution: https://www.jetbrains.com/help/clion/remote-projects-sup
 Raspberry PI OS in docker: https://github.com/lukechilds/dockerpi
 
 docker run -it -p 5022:5022 -v C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\SO2\proiect\raspberry_v:/sdcard lukechilds/dockerpi
+
+login: pi
+password: raspberry
+
 ssh pi@localhost -p 5022
 
 Raspberry PI OS in VM: https://www.howtogeek.com/run-a-raspberry-pi-in-virtualbox/
+
+https://tttapa.github.io/Pages/Raspberry-Pi/C++-Development-RPiOS/Debugging.html
+
+RASPBERRY STEPS:
+sudo apt-get dist-upgrade
+
+press q to exit from changelogs...
+
