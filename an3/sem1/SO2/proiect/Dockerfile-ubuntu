@@ -22,8 +22,9 @@ EXPOSE 22
 
 # Run SSH
 CMD ["/usr/sbin/sshd", "-D"]
-
 # docker build -f .\Dockerfile-ubuntu -t ubuntu-ssh .
 # docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d -p 2222:22 ubuntu-ssh
 # ssh-keygen -R [localhost]:2222; ssh ubuntu@localhost -p 2222
 # gcclinaro, xtools !! 
+
+# sudo apt-get install gcc-arm-linux-gnueabihf

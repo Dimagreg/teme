@@ -10,16 +10,13 @@
 #include <time.h>
 #include "mpi.h"
 
-// #define DEBUG 1
+#define DEBUG 1
 #define INFECTED_DURATION 15 // simulation time a person is infected ( > 1)
 #define IMMUNE_DURATION 10 // simulation time a person is immune to being infected ( > 1)
-
-#define POLICY dynamic
-#define CHUNK_SIZE 100
+#define MASTER 0 // MPI master node
 
 int TOTAL_SIMULATION_TIME;
 char inputFileName[256];
-int Thread_count;
 
 struct timespec start, finish;
 double elapsed;
@@ -65,90 +62,98 @@ void computeLocation(struct person *person);
 void computeZoneSequential(struct person *person);
 void computeNextStatus(struct person **st_person, int start, int end);
 void computePersonNextStatus(struct person *person);
-void processSimulationParallel_V1(struct person **st_person);
-void processSimulationParallel_V2(struct person **st_person);
-void threadProcessSimulationParallel_V2(struct person **st_person, int start, int end);
+void processSimulationParallel(struct person **st_person, int rank, int size);
 void printDebug(int simulation_time, struct person **st_person);
 char *writeOutputFile(char *filename, char *postfix, struct person *st_person);
-int compareFiles(char *file1, char *file2, char *file3);
+int compareFiles(char *file1, char *file2);
 
 int main(int argc, char* argv[])
 {
     struct person *st_person = NULL;
+    double elapsed_serial;
+    char *outputFile_serial;
+    int rank, size;
 
-    if (argc < 4)
+    // init MPI
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    if (rank == MASTER)
     {
-        printf("incorrect number of arguments\n");
-        printf("use: ./app <TOTAL_SIMULATION_TIME> <inputFileName> <Thread_count>\n");
-        exit(1);
+        if (argc != 3)
+        {
+            printf("incorrect number of arguments\n");
+            printf("use: ./app <TOTAL_SIMULATION_TIME> <inputFileName>\n");
+            exit(1);
+        }
+
+        readArguments(argv);
+
+        // Serial
+        readInputFile(&st_person);
+
+        printf("Simulation for %d people, Simulation duration: %d, argv[0] = %s\n", PEOPLE_COUNT, TOTAL_SIMULATION_TIME, argv[0]);
+
+        clock_gettime(CLOCK_MONOTONIC, &start); 
+        processSimulationSequential(&st_person);
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+
+        elapsed = (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+        
+        elapsed_serial = elapsed;
+
+        printf("Elapsed time for Sequential simulation: %fs\n", elapsed_serial);
+
+        char *outputFile_serial = writeOutputFile(argv[2], "_serial_out.txt", st_person);
+
+        readInputFile(&st_person);
+        clock_gettime(CLOCK_MONOTONIC, &start);
     }
 
-    readArguments(argv);
-
-    // Serial
-    readInputFile(&st_person);
-
-    printf("Simulation for %d people, Simulation duration: %d, Threads: %d, argv[0] = %s\n", PEOPLE_COUNT, TOTAL_SIMULATION_TIME, Thread_count, argv[0]);
-
-    clock_gettime(CLOCK_MONOTONIC, &start); 
-    processSimulationSequential(&st_person);
-    clock_gettime(CLOCK_MONOTONIC, &finish);
-
-    elapsed = (finish.tv_sec - start.tv_sec);
-    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("main barrier 1 rank=%d\n", rank);
+    // code executed by multiple processors
+    printf("processSimulationParallel rank=%d\n", rank);
+    processSimulationParallel(&st_person, rank, size);
     
-    double elapsed_serial = elapsed;
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("main barrier 2 rank=%d\n", rank);
 
-    printf("Elapsed time for Sequential simulation: %fs\n", elapsed_serial);
-
-    char *outputFile_serial = writeOutputFile(argv[2], "_serial_out.txt", st_person);
-
-    // Parallel V1
-    readInputFile(&st_person);
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    processSimulationParallel_V1(&st_person);
-    clock_gettime(CLOCK_MONOTONIC, &finish);
-
-    elapsed = (finish.tv_sec - start.tv_sec);
-    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-
-    printf("Elapsed time for Omp1 simulation: %fs Speedup: %f\n", elapsed, elapsed_serial / elapsed);
-
-    char *outputFile_parallel_v1 = writeOutputFile(argv[2], "_omp1_out.txt", st_person);
-
-    // Parallel V2
-    readInputFile(&st_person);
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    processSimulationParallel_V2(&st_person);
-    clock_gettime(CLOCK_MONOTONIC, &finish);
-
-    elapsed = (finish.tv_sec - start.tv_sec);
-    elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-
-    printf("Elapsed time for Omp2 simulation: %fs Speedup: %f\n", elapsed, elapsed_serial / elapsed);
-
-    char *outputFile_parallel_v2 = writeOutputFile(argv[2], "_omp2_out.txt", st_person);
-
-    int filesEqual = compareFiles(outputFile_serial, outputFile_parallel_v1, outputFile_parallel_v2);
-
-    if (filesEqual)
+    if (rank == MASTER)
     {
-        printf("Files have the same content\n");
-    }
-    else
-    {
-        printf("Files do not have the same content\n");
-    }
+        clock_gettime(CLOCK_MONOTONIC, &finish);
 
-    free(st_person);
+        elapsed = (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
-    for (int i = 0; i < MAX_X_COORD; i++)
-    {
-        free(ZONE[i]);
+        printf("Elapsed time for MPI simulation: %fs Speedup: %f\n", elapsed, elapsed_serial / elapsed);
+
+        char *outputFile_parallel = writeOutputFile(argv[2], "_mpi_out.txt", st_person);
+
+        int filesEqual = compareFiles(outputFile_serial, outputFile_parallel);
+
+        if (filesEqual)
+        {
+            printf("Files have the same content\n");
+        }
+        else
+        {
+            printf("Files do not have the same content\n");
+        }
+
+        free(st_person);
+
+        for (int i = 0; i < MAX_X_COORD; i++)
+        {
+            free(ZONE[i]);
+        }
+        free(ZONE);
     }
-    free(ZONE);
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    MPI_Finalize();
 
     return 0;
 }
@@ -158,9 +163,17 @@ void readArguments(char *argv[])
     char* p;
     long arg;
 
+    printf("argv[0] = %s\n", argv[0]);
+    printf("argv[1] = %s\n", argv[1]);
+    printf("argv[2] = %s\n", argv[2]);
+
+    printf("strerror: %s\n", strerror(errno));
+
+    errno = 0;
+
     arg = strtol(argv[1], &p, 10);
     if (*p != '\0' || errno != 0) {
-        printf("strtol error\n");
+        printf("strtol error argv[1]: %s\n", strerror(errno));
         exit(1);
     }
 
@@ -170,19 +183,6 @@ void readArguments(char *argv[])
     }
 
     TOTAL_SIMULATION_TIME = arg;
-
-    arg = strtol(argv[3], &p, 10);
-    if (*p != '\0' || errno != 0) {
-        printf("strtol error\n");
-        exit(1);
-    }
-
-    if (arg < INT_MIN || arg > INT_MAX) {
-        printf("arguments int limits exceeded\n");
-        exit(1);
-    }
-
-    Thread_count = arg;
 
     if (strlen(argv[2]) > 256)
     {
@@ -466,117 +466,98 @@ void computePersonNextStatus(struct person *person)
     }
 }
 
-void processSimulationParallel_V1(struct person **st_person)
+void processSimulationParallel(struct person **st_person, int rank, int size)
 {
     // Simulation for parallel processing of each person.
-    // V1 - Parallel for with scheduling policy and chunksizes
-    // This method will execute each action with omp parallel for.
-    // It's surprisingly faster rather than sequential version tbh.
+    // Using MPI Scatter and Gather
 
-    #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
-    for (int i = 0; i < PEOPLE_COUNT; i++)
+    // calculate indexes for each process
+    int chunk = PEOPLE_COUNT / size;
+    int start = rank * chunk;
+    int end = (rank == size - 1) ? PEOPLE_COUNT : (rank + 1) * chunk;
+
+    struct person *local_person = malloc(chunk * sizeof(struct person));
+
+    if (!local_person)
     {
-        // at spawn time 0, if the person spawns with infected -> give him infection. (c'est la vie)
-        computeNextStatus(st_person, i, i + 1);
+        perror("local_person malloc");
+        exit(1);
     }
 
-    for (int i = 1; i <= TOTAL_SIMULATION_TIME; i++)
-    {   
-        #ifdef DEBUG
-                printf("simulation time %d\n", i);
-        #endif
+    printf("i scatter\n");
 
-        // reset ZONE for each simulation time
-        resetZone();
-
-        // update location of each person
-        #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
-        for (int i = 0; i < PEOPLE_COUNT; i++)
-        {
-            updateLocation(st_person, i, i + 1);
-        }
-
-        // decrement effect time for each person
-        #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
-        for (int i = 0; i < PEOPLE_COUNT; i++)
-        {
-            decrementEffectTime(st_person, i, i + 1);
-        }
-
-        // compute status for next simulation time
-        #pragma omp parallel for num_threads(Thread_count) schedule(POLICY, CHUNK_SIZE)
-        for (int i = 0; i < PEOPLE_COUNT; i++)
-        {
-            computeNextStatus(st_person, i, i + 1);
-        }
-
-        #ifdef DEBUG
-            printf("debug for parallel simulation\n");
-            printDebug(i, st_person);
-        #endif
-    }
-}
-
-void processSimulationParallel_V2(struct person **st_person)
-{
-    // Simulation for parallel processing of each person. People are divided by number of threads.
-    // V2 - Manual explicit data partitioning
-    #pragma omp parallel num_threads(Thread_count)
+    if (rank == MASTER)
     {
-        // fixed bug where I exit program if I can't divide people by threads :)
-        int thread_id = omp_get_thread_num();
-        int start = thread_id * (PEOPLE_COUNT / Thread_count);
-        int end = (thread_id == Thread_count - 1) ? PEOPLE_COUNT : (thread_id + 1) * (PEOPLE_COUNT / Thread_count); // gets the rest of people on last thread
-
-        threadProcessSimulationParallel_V2(st_person, start, end);
+        // scatter to processes size of chunk of st_person
+        MPI_Scatter(*st_person, chunk * sizeof(struct person), MPI_BYTE, 
+            local_person, chunk * sizeof(struct person), MPI_BYTE, 0, MPI_COMM_WORLD);
     }
-}
 
-void threadProcessSimulationParallel_V2(struct person **st_person, int start, int end)
-{
-    // Simulation for parallel processing of each person.
+    MPI_Barrier(MPI_COMM_WORLD);
+
     // at spawn time 0, if the person spawns with infected -> give him infection. (c'est la vie)
-    computeNextStatus(st_person, start, end);
+    computeNextStatus(&local_person, 0, chunk);
 
-    #pragma omp barrier
+    MPI_Barrier(MPI_COMM_WORLD);
 
+    printf("starting simulation\n");
+
+    // simulation loop
     for (int i = 1; i <= TOTAL_SIMULATION_TIME; i++)
-    {   
-        #ifdef DEBUG
-            #pragma omp single // make sure prints only one thread
+    {
+        if (rank == MASTER)
+        {
+            #ifdef DEBUG
                 printf("simulation time %d\n", i);
-        #endif
+            #endif
+            
+            // reset ZONE for each simulation time
+            resetZone();
+        }
 
-        // reset ZONE for each simulation time
-        resetZone();
-        #pragma omp barrier
+        MPI_Barrier(MPI_COMM_WORLD);
+        printf("barrier 1 rank=%d\n", rank);
 
         // update location of each person
-        updateLocation(st_person, start, end);
-        #pragma omp barrier
+        updateLocation(&local_person, 0, chunk);
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        printf("barrier 2 rank=%d\n", rank);
 
         // decrement effect time for each person
-        decrementEffectTime(st_person, start, end);
-        #pragma omp barrier
+        decrementEffectTime(&local_person, 0, chunk);
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        printf("barrier 3 rank=%d\n", rank);
 
         // compute status for next simulation time
-        computeNextStatus(st_person, start, end);
-        #pragma omp barrier
+        computeNextStatus(&local_person, 0, chunk);
+        MPI_Barrier(MPI_COMM_WORLD);
 
-        #ifdef DEBUG
-            #pragma omp single
-            {
-                printf("debug for parallel simulation\n");
-                printDebug(i, st_person);
-            }
-        #endif
+        printf("barrier 4 rank=%d\n", rank);
 
-        // set flag to reset ZONE for next simulation time
-        #pragma omp single
+        if (rank == MASTER)
         {
-            isResetZoneCalled = 0;
+            #ifdef DEBUG
+                printf("debug for parallel simulation\n");
+                printDebug(i, &local_person);
+            #endif
         }
     }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (rank != MASTER)
+    {
+        // gather local_person -> st_person
+        MPI_Gather(local_person, chunk * sizeof(struct person), MPI_BYTE,
+            *st_person, chunk * sizeof(struct person), MPI_BYTE,
+            0, MPI_COMM_WORLD);
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    free(local_person);
 }
 
 void resetZoneParallel()
@@ -628,13 +609,12 @@ char *writeOutputFile(char *filename, char *postfix, struct person *st_person)
     return finalNameOutput;
 }
 
-int compareFiles(char *file1, char *file2, char *file3)
+int compareFiles(char *file1, char *file2)
 {
     FILE *f1 = fopen(file1, "rb");
     FILE *f2 = fopen(file2, "rb");
-    FILE *f3 = fopen(file3, "rb");
 
-    if (!f1 || !f2 || !f3)
+    if (!f1 || !f2)
     {
         perror("Cannot open files for comparison");
         exit(1);
@@ -656,26 +636,6 @@ int compareFiles(char *file1, char *file2, char *file3)
         {
             fclose(f1);
             fclose(f2);
-            fclose(f3);
-
-            return 0;
-        }
-    }
-
-    // if not returned 0, f1 equals to f2 => Compare f1 to f3
-    while (fscanf(f1, "%s", buff1) != EOF)
-    {
-        if (fscanf(f3, "%s", buff2) == EOF)
-        {
-            perror("EOF on f3");
-            exit(1);
-        }
-
-        if (strcmp(buff1, buff2) != 0)
-        {
-            fclose(f1);
-            fclose(f2);
-            fclose(f3);
 
             return 0;
         }
@@ -683,7 +643,6 @@ int compareFiles(char *file1, char *file2, char *file3)
 
     fclose(f1);
     fclose(f2);
-    fclose(f3);
 
     return 1;
 }

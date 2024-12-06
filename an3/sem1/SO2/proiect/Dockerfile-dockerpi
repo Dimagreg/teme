@@ -1,28 +1,29 @@
-# Use the raspberrypi/debian image as a parent image
+# Use the official Raspberry Pi image as a parent image
 FROM desktopcontainers/raspberrypi
 
-# Update the system, install OpenSSH Server, and set up users
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y openssh-server gcc g++ cmake gdb && \
+# Update the sources list to use Debian Buster
+RUN sed -i 's/stretch/buster/g' /etc/apt/sources.list
+
+# Update the system and install OpenSSH Server
+RUN apt-get update && apt-get upgrade -y --allow-unauthenticated && \
+    apt-get install -y openssh-server gcc g++ --allow-unauthenticated && \
     rm -rf /var/lib/apt/lists/*
 
-# Create user and set password for user and root user
-RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u 1000 ubuntu && \
-    echo 'ubuntu:password' | chpasswd && \
-    echo 'root:password' | chpasswd
-
 # Set up configuration for SSH
-RUN mkdir /var/run/sshd && \
+RUN [ ! -d /var/run/sshd ] && mkdir /var/run/sshd || true && \
     sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
     echo "export VISIBLE=now" >> /etc/profile
+
+# Copy hello_world_c directory to /home/pi/hello_world_c in the container
+COPY /example_code/hello_world_c /home/pi/hello_world_c
+
 
 # Expose the SSH port
 EXPOSE 22
 
 # Run SSH
 CMD ["/usr/sbin/sshd", "-D"]
-
 # docker build -f Dockerfile-dockerpi -t dockerpi-ssh .
 # docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -d -p 2222:22 dockerpi-ssh
-# ssh-keygen -R [localhost]:2222; ssh ubuntu@localhost -p 2222
+# ssh-keygen -R [localhost]:2222; ssh pi@localhost -p 2222
