@@ -1,0 +1,76 @@
+version: '3.8'
+services:
+  mysql-master:
+    image: mysql:5.7
+    container_name: mysql-master
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_REPLICATION_USER: repl_user
+      MYSQL_REPLICATION_PASSWORD: repl_pass
+      MYSQL_DATABASE: name_basics
+    ports:
+      - "3307:3306"
+    command: ["mysqld"]
+    volumes:
+      - master_data:/var/lib/mysql
+      - ./master_my.cnf:/etc/mysql/my.cnf
+      - ./scripts:/home/scripts
+      - ./data:/home/data
+    networks:
+      - mysql-network
+
+  mysql-slave1:
+    image: mysql:5.7
+    container_name: mysql-slave1
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_REPLICATION_USER: repl_user
+      MYSQL_REPLICATION_PASSWORD: repl_pass
+    ports:
+      - "3308:3306"
+    command: ["mysqld"]
+    volumes:
+      - slave1_data:/var/lib/mysql
+      - ./slave1_my.cnf:/etc/mysql/my.cnf
+    networks:
+      - mysql-network
+
+  mysql-slave2:
+    image: mysql:5.7
+    container_name: mysql-slave2
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_REPLICATION_USER: repl_user
+      MYSQL_REPLICATION_PASSWORD: repl_pass
+    ports:
+      - "3309:3306"
+    command: ["mysqld"]
+    volumes:
+      - slave2_data:/var/lib/mysql
+      - ./slave2_my.cnf:/etc/mysql/my.cnf
+    networks:
+      - mysql-network
+
+  mysql-slave3:
+    image: mysql:5.7
+    container_name: mysql-slave3
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_REPLICATION_USER: repl_user
+      MYSQL_REPLICATION_PASSWORD: repl_pass
+    ports:
+      - "3310:3306"
+    command: ["mysqld"]
+    volumes:
+      - slave3_data:/var/lib/mysql
+      - ./slave3_my.cnf:/etc/mysql/my.cnf
+    networks:
+      - mysql-network
+
+networks:
+  mysql-network:
+volumes:
+  master_data:
+  slave1_data:
+  slave2_data:
+  slave3_data:

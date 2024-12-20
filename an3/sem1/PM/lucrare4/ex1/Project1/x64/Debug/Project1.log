@@ -1,0 +1,110 @@
+﻿  main.cpp
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(18,2): error C4235: nonstandard extension used: '__asm' keyword not supported on this architecture
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(19,3): error C2065: 'pushfd': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(20,3): error C2146: syntax error: missing ';' before identifier 'pop'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(20,3): error C2065: 'pop': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(20,7): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(20,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(21,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(21,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(21,7): error C2146: syntax error: missing ';' before identifier 'eflags1'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(21,16): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(22,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(22,12): error C3688: invalid literal suffix 'h'; literal operator or literal operator template 'operator ""h' not found
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(23,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(23,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(23,7): error C2146: syntax error: missing ';' before identifier 'eflags2'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(23,16): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(24,3): error C2146: syntax error: missing ';' before identifier 'push'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(24,3): error C2065: 'push': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(24,8): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(24,8): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(25,3): error C2146: syntax error: missing ';' before identifier 'popfd'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(25,3): error C2065: 'popfd': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(26,3): error C2146: syntax error: missing ';' before identifier 'pushfd'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(26,3): error C2065: 'pushfd': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(27,3): error C2146: syntax error: missing ';' before identifier 'pop'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(27,3): error C2065: 'pop': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(27,7): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(27,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(28,3): error C2146: syntax error: missing ';' before identifier 'cmp'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(28,3): error C2065: 'cmp': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(28,7): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(28,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(29,3): error C2146: syntax error: missing ';' before identifier 'je'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(29,3): error C2065: 'je': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(29,6): error C2146: syntax error: missing ';' before identifier 'SUCCESS'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(29,6): error C2065: 'SUCCESS': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(30,3): error C2146: syntax error: missing ';' before identifier 'jmp'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(30,3): error C2065: 'jmp': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(30,7): error C2146: syntax error: missing ';' before identifier 'CONTINUE'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(30,7): error C2065: 'CONTINUE': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(31,3): error C2146: syntax error: missing ';' before identifier 'SUCCESS'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(31,13): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(31,17): error C2146: syntax error: missing ';' before identifier 'success'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(32,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(32,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(32,7): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(32,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(32,12): error C3688: invalid literal suffix 'h'; literal operator or literal operator template 'operator ""h' not found
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(33,3): error C2146: syntax error: missing ';' before identifier 'cpuid'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(33,3): error C2065: 'cpuid': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(34,3): error C2146: syntax error: missing ';' before identifier 'CONTINUE'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(34,14): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(34,18): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(34,18): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(35,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(35,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(35,7): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(35,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(37,3): error C2146: syntax error: missing ';' before identifier 'cpuid'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(37,3): error C2065: 'cpuid': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,7): error C2146: syntax error: missing ';' before identifier 'DWORD'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,17): error C2146: syntax error: missing ';' before identifier 'vendorID'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,27): error C2065: 'ebx': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(39,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(39,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(39,7): error C2146: syntax error: missing ';' before identifier 'DWORD'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(39,13): error C2086: 'DWORD PTR': redefinition
+      C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,13):
+      see declaration of 'PTR'
+  
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(39,17): error C2146: syntax error: missing ';' before identifier 'vendorID'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(39,31): error C2065: 'edx': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(40,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(40,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(40,7): error C2146: syntax error: missing ';' before identifier 'DWORD'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(40,13): error C2086: 'DWORD PTR': redefinition
+      C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(38,13):
+      see declaration of 'PTR'
+  
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(40,17): error C2146: syntax error: missing ';' before identifier 'vendorID'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(40,31): error C2065: 'ecx': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(41,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(41,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(41,7): error C2146: syntax error: missing ';' before identifier 'eax'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(41,7): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(43,3): error C2146: syntax error: missing ';' before identifier 'cpuid'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(43,3): error C2065: 'cpuid': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(44,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(44,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(44,7): error C2146: syntax error: missing ';' before identifier 'modelNum'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(44,17): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(45,17): error C3688: invalid literal suffix 'F0h'; literal operator or literal operator template 'operator ""F0h' not found
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(46,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(46,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(46,7): error C2146: syntax error: missing ';' before identifier 'FamilyCODE'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(46,19): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(47,19): error C3688: invalid literal suffix 'F00h'; literal operator or literal operator template 'operator ""F00h' not found
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(48,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(48,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(48,7): error C2146: syntax error: missing ';' before identifier 'procTYPE'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(48,17): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(49,17): error C3688: invalid literal suffix 'h'; literal operator or literal operator template 'operator ""h' not found
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(50,3): error C2146: syntax error: missing ';' before identifier 'mov'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(50,3): error C2065: 'mov': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(50,7): error C2146: syntax error: missing ';' before identifier 'ExtMODE'
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(50,16): error C2065: 'eax': undeclared identifier
+C:\Users\dmitrii.grigori\Documents\teme\an3\sem1\PM\lucrare4\ex1\Project1\main.cpp(50,16): error C1003: error count exceeds 100; stopping compilation

@@ -55,13 +55,14 @@ void setZone(struct person *person);
 void initPersonEffect(struct person *person);
 void processSimulationSequential(struct person **st_person);
 void resetZone();
-void resetZoneParallel();
+void resetZoneParallel(int rank);
 void decrementEffectTime(struct person **st_person, int start, int end);
 void updateLocation(struct person **st_person, int start, int end);
-void computeLocation(struct person *person);
+void computeLocation(struct person *person, int *local_zone);
 void computeZoneSequential(struct person *person);
+void computeZoneParallel(struct person *person, int rank);
 void computeNextStatus(struct person **st_person, int start, int end);
-void computePersonNextStatus(struct person *person);
+void computePersonNextStatus(struct person *person, int *local_zone);
 void processSimulationParallel(struct person **st_person, int rank, int size);
 void printDebug(int simulation_time, struct person **st_person);
 char *writeOutputFile(char *filename, char *postfix, struct person *st_person);
@@ -72,55 +73,87 @@ int main(int argc, char* argv[])
     struct person *st_person = NULL;
     double elapsed_serial;
     char *outputFile_serial;
+    char *outputFile_parallel;
     int rank, size;
 
-    // init MPI
+    // Initialize MPI
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+    // MASTER initializes
     if (rank == MASTER)
     {
         if (argc != 3)
         {
-            printf("incorrect number of arguments\n");
-            printf("use: ./app <TOTAL_SIMULATION_TIME> <inputFileName>\n");
-            exit(1);
+            printf("Incorrect number of arguments\n");
+            printf("Usage: ./app <TOTAL_SIMULATION_TIME> <inputFileName>\n");
+            MPI_Abort(MPI_COMM_WORLD, 1);
         }
 
         readArguments(argv);
-
-        // Serial
         readInputFile(&st_person);
 
-        printf("Simulation for %d people, Simulation duration: %d, argv[0] = %s\n", PEOPLE_COUNT, TOTAL_SIMULATION_TIME, argv[0]);
+        printf("Simulation for %d people, Simulation duration: %d\n",
+               PEOPLE_COUNT, TOTAL_SIMULATION_TIME);
 
-        clock_gettime(CLOCK_MONOTONIC, &start); 
-        processSimulationSequential(&st_person);
+        // Serial simulation for comparison
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        processSimulationSequential(&st_person, rank);
         clock_gettime(CLOCK_MONOTONIC, &finish);
 
         elapsed = (finish.tv_sec - start.tv_sec);
         elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
-        
         elapsed_serial = elapsed;
 
         printf("Elapsed time for Sequential simulation: %fs\n", elapsed_serial);
 
-        char *outputFile_serial = writeOutputFile(argv[2], "_serial_out.txt", st_person);
+        outputFile_serial = writeOutputFile(argv[2], "_serial_out.txt", st_person);
 
-        readInputFile(&st_person);
+        readInputFile(&st_person); // Reset data for parallel simulation
         clock_gettime(CLOCK_MONOTONIC, &start);
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-    printf("main barrier 1 rank=%d\n", rank);
-    // code executed by multiple processors
+
+    MPI_Bcast(&PEOPLE_COUNT, 1, MPI_INT, MASTER, MPI_COMM_WORLD);
+    MPI_Bcast(&MAX_X_COORD, 1, MPI_INT, MASTER, MPI_COMM_WORLD);
+    MPI_Bcast(&MAX_Y_COORD, 1, MPI_INT, MASTER, MPI_COMM_WORLD);
+    MPI_Bcast(&(ZONE[0][0]), MAX_X_COORD * MAX_Y_COORD, MPI_INT, MASTER, MPI_COMM_WORLD);
+
+    printf("rank=%d, PEOPLE_COUNT=%d, MAX_X_COORD=%d, MAX_Y_COORD=%d\n", rank, PEOPLE_COUNT, MAX_X_COORD, MAX_Y_COORD);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    // Allocate memory for st_person (if necessary) or ensure it matches MASTER's initialization
+    if (rank != MASTER)
+    {
+        st_person = malloc(PEOPLE_COUNT * sizeof(struct person));
+        if (!st_person)
+        {
+            perror("Memory allocation failed for st_person");
+            MPI_Abort(MPI_COMM_WORLD, 1);
+        }
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);  // Ensure that all processes are at the same point
+    
+    // Synchronize and broadcast st_person to all processes
+    MPI_Bcast(st_person, PEOPLE_COUNT * sizeof(struct person), MPI_BYTE, MASTER, MPI_COMM_WORLD);
+
+    // Ensure synchronization before starting parallel simulation
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("main barrier 0 rank=%d\n", rank);
+
+    // Execute parallel simulation
     printf("processSimulationParallel rank=%d\n", rank);
     processSimulationParallel(&st_person, rank, size);
-    
-    MPI_Barrier(MPI_COMM_WORLD);
-    printf("main barrier 2 rank=%d\n", rank);
 
+    // Synchronize before finalizing
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("main barrier 1 rank=%d\n", rank);
+
+    // MASTER gathers results and prints them
     if (rank == MASTER)
     {
         clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -130,7 +163,7 @@ int main(int argc, char* argv[])
 
         printf("Elapsed time for MPI simulation: %fs Speedup: %f\n", elapsed, elapsed_serial / elapsed);
 
-        char *outputFile_parallel = writeOutputFile(argv[2], "_mpi_out.txt", st_person);
+        outputFile_parallel = writeOutputFile(argv[2], "_mpi_out.txt", st_person);
 
         int filesEqual = compareFiles(outputFile_serial, outputFile_parallel);
 
@@ -151,8 +184,11 @@ int main(int argc, char* argv[])
         }
         free(ZONE);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
 
+    printf("rank=%d, MPI_Finalize\n", rank);
+
+    // Final synchronization and clean-up
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
 
     return 0;
@@ -267,6 +303,22 @@ void setZone(struct person *person)
     }
 }
 
+void setZoneParallel(struct person *person, int *local_zone)
+{
+    if (person->current_status == 0)
+    {
+        local_zone[person->x * MAX_Y_COORD + person->y] = 1; // Mark as infected in the local copy
+    }
+}
+
+void updateGlobalZone(int *local_zone)
+{
+    MPI_Reduce(local_zone, &(ZONE[0][0]), MAX_X_COORD * MAX_Y_COORD, MPI_INT, MPI_LOR, MASTER, MPI_COMM_WORLD);
+
+    // Broadcast the updated ZONE back to all processes
+    MPI_Bcast(&(ZONE[0][0]), MAX_X_COORD * MAX_Y_COORD, MPI_INT, MASTER, MPI_COMM_WORLD);
+}
+
 void initPersonEffect(struct person *person)
 {
     switch (person->current_status)
@@ -292,7 +344,7 @@ void initPersonEffect(struct person *person)
     }
 }
 
-void processSimulationSequential(struct person **st_person)
+void processSimulationSequential(struct person **st_person, int rank)
 {
     // Simulation for sequential processing of each person.
 
@@ -306,7 +358,7 @@ void processSimulationSequential(struct person **st_person)
         #endif
 
         // reset ZONE for each simulation time
-        resetZone();
+        resetZone(rank);
 
         // update location of each person
         updateLocation(st_person, 0, PEOPLE_COUNT);
@@ -337,15 +389,22 @@ void printDebug(int simulation_time, struct person **st_person)
     }
 }      
 
-void resetZone()
+void resetZone(int rank)
 {
-    for (int i = 0; i < MAX_X_COORD; i++)
+    // MASTER resets the zone
+    if (rank == MASTER)
     {
-        for (int j = 0; j < MAX_Y_COORD; j++)
+        for (int i = 0; i < MAX_X_COORD; i++)
         {
-            ZONE[i][j] = 0;
+            for (int j = 0; j < MAX_Y_COORD; j++)
+            {
+                ZONE[i][j] = 0;
+            }
         }
     }
+
+    // Broadcast the reset ZONE to all processes
+    MPI_Bcast(&(ZONE[0][0]), MAX_X_COORD * MAX_Y_COORD, MPI_INT, MASTER, MPI_COMM_WORLD);
 }
 
 void decrementEffectTime(struct person **st_person, int start, int end)
@@ -361,12 +420,26 @@ void decrementEffectTime(struct person **st_person, int start, int end)
 
 void updateLocation(struct person **st_person, int start, int end)
 {
+    // Local zone array for this process
+    int *local_zone = calloc(MAX_X_COORD * MAX_Y_COORD, sizeof(int));
+    if (!local_zone)
+    {
+        perror("local_zone calloc");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+
     for (int i = start; i < end; i++)
     {
-        computeLocation(&(*st_person)[i]);
+        computeLocation(&(*st_person)[i], local_zone);
     }
+
+    // Update the global ZONE after processing locations
+    updateGlobalZone(local_zone);
+
+    free(local_zone);
 }
-void computeLocation(struct person *person)
+
+void computeLocation(struct person *person, int *local_zone)
 {
     // ROWS are X, COLS are Y
     switch (person->pattern_direction)
@@ -392,78 +465,104 @@ void computeLocation(struct person *person)
         exit(1);
     }
 
+    // Handle boundary conditions
     if (person->x < 0)
     {
-        // x out of bounds because of N direction, switch to S
-        person->x = abs(person->x); // using abs if amplitude made him take multiple steps and get him back in bounds keeping steps
+        person->x = abs(person->x);
         person->pattern_direction = 1;
     }
     else if (person->x >= MAX_X_COORD)
     {
-        // x out of bounds because of S direction, switch to N
         person->x = MAX_X_COORD - (person->x - (MAX_X_COORD - 1)) - 1;
         person->pattern_direction = 0;
     }
 
     if (person->y < 0)
     {
-        // y out of bounds because of W direction, switch to E
         person->y = abs(person->y);
         person->pattern_direction = 2;
     }
     else if (person->y >= MAX_Y_COORD)
     {
-        // y out of bounds because of E direction, switch to W
         person->y = MAX_Y_COORD - (person->y - (MAX_Y_COORD - 1)) - 1;
         person->pattern_direction = 3;
     }
 
-    // mark current zone based on status
-    setZone(person);
+    // Update the local zone array
+    if (person->current_status == 0) // Mark as infected in local zone
+    {
+        local_zone[person->x * MAX_Y_COORD + person->y] = 1;
+    }
 }
 
 
 void computeNextStatus(struct person **st_person, int start, int end)
 {
+     // Create a local copy of ZONE for this rank
+    int *local_zone = calloc(MAX_X_COORD * MAX_Y_COORD, sizeof(int));
+    if (!local_zone)
+    {
+        perror("local_zone calloc");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+
     for (int i = start; i < end; i++)
     {
-        computePersonNextStatus(&(*st_person)[i]);
+        computePersonNextStatus(&(*st_person)[i], local_zone);
     }
+
+    // Update the global ZONE after processing all persons
+    updateGlobalZone(local_zone);
+
+    free(local_zone);
 }
 
-void computePersonNextStatus(struct person *person)
+void computePersonNextStatus(struct person *person, int *local_zone)
 {
-    //compute if effects and person is not susceptible (no effects)
     if (person->effect_time_left == 0 && person->current_status != 1)
     {
         switch (person->current_status)
         {
-            case 0: //infection expired -> make immune
-                person->current_status = 2;
+            case 0:
+                person->current_status = 2; // Infection expired -> immune
                 person->effect_time_left = IMMUNE_DURATION;
                 break;
-            
-            case 2: //immunity expired -> make susceptible
-                person->current_status = 1;
+
+            case 2:
+                person->current_status = 1; // Immunity expired -> susceptible
                 person->effect_time_left = 0;
                 break;
         }
     }
 
-    if (ZONE[person->x][person->y] == 1)
+    if (local_zone[person->x * MAX_Y_COORD + person->y] == 1)
     {
-        // person is susceptible -> set next status to infected
-        if (person->current_status == 1)
+        if (person->current_status == 1) // Susceptible -> infected
         {
             person->current_status = 0;
             person->effect_time_left = INFECTED_DURATION;
             person->infected_times++;
         }
     }
-    else
-    {
-        // noop
+
+    setZoneParallel(person, local_zone); // Update the local zone based on the person's status
+}
+
+
+void resetZoneParallel(int rank, int size) {
+    // Each rank initializes its part of the ZONE
+    int rows_per_rank = MAX_X_COORD / size;
+    int start_row = rank * rows_per_rank;
+    int end_row = (rank == size - 1) ? MAX_X_COORD : (rank + 1) * rows_per_rank;
+
+    for (int i = start_row; i < end_row; i++) {
+        for (int j = 0; j < MAX_Y_COORD; j++) {
+            ZONE[i][j] = 0;
+        }
     }
+
+    // Synchronize ZONE across all ranks
+    MPI_Allreduce(MPI_IN_PLACE, &ZONE[0][0], MAX_X_COORD * MAX_Y_COORD, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 }
 
 void processSimulationParallel(struct person **st_person, int rank, int size)
@@ -471,106 +570,116 @@ void processSimulationParallel(struct person **st_person, int rank, int size)
     // Simulation for parallel processing of each person.
     // Using MPI Scatter and Gather
 
-    // calculate indexes for each process
-    int chunk = PEOPLE_COUNT / size;
-    int start = rank * chunk;
-    int end = (rank == size - 1) ? PEOPLE_COUNT : (rank + 1) * chunk;
+    printf("rank=%d, PEOPLE_COUNT=%d\n", rank, PEOPLE_COUNT);
 
-    struct person *local_person = malloc(chunk * sizeof(struct person));
+    // Calculate data partitioning for each rank
+    int start = rank * (PEOPLE_COUNT / size);
+    int end = (rank == size - 1) ? PEOPLE_COUNT : (rank + 1) * (PEOPLE_COUNT / size);
+
+    printf("rank=%d, start=%d, end=%d\n", rank, start, end);
+
+    // Allocate memory for local data
+    int local_count = end - start;
+    printf("rank=%d, local_count=%d\n", rank, local_count);
+
+    struct person *local_person = malloc(local_count * sizeof(struct person));
 
     if (!local_person)
     {
         perror("local_person malloc");
-        exit(1);
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    printf("i scatter\n");
+    // Scatter data to ranks: we need to calculate displacements and counts based on start and end for each rank
+    int *sendcounts = malloc(size * sizeof(int));
+    int *displs = malloc(size * sizeof(int));
 
-    if (rank == MASTER)
-    {
-        // scatter to processes size of chunk of st_person
-        MPI_Scatter(*st_person, chunk * sizeof(struct person), MPI_BYTE, 
-            local_person, chunk * sizeof(struct person), MPI_BYTE, 0, MPI_COMM_WORLD);
+    for (int i = 0; i < size; i++) {
+        int rank_start = i * (PEOPLE_COUNT / size);
+        int rank_end = (i == size - 1) ? PEOPLE_COUNT : (i + 1) * (PEOPLE_COUNT / size);
+        
+        // Each rank will get the same chunk size except for the last rank
+        sendcounts[i] = rank_end - rank_start;
+        displs[i] = rank_start;
+
+        printf("rank=%d, sendcounts[%d]=%d, displs[%d]=%d\n", rank, i, sendcounts[i], i, displs[i]);
     }
 
+    // Synchronize all processes before the scatter operation
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // at spawn time 0, if the person spawns with infected -> give him infection. (c'est la vie)
-    computeNextStatus(&local_person, 0, chunk);
+    // Scatter the data
+    MPI_Scatterv(*st_person, sendcounts, displs, MPI_BYTE,
+                local_person, local_count * sizeof(struct person), MPI_BYTE,
+                MASTER, MPI_COMM_WORLD);
 
+    // Ensure that the process finishes receiving before moving on
     MPI_Barrier(MPI_COMM_WORLD);
 
-    printf("starting simulation\n");
+    free(sendcounts);
+    free(displs);
 
-    // simulation loop
+    // Perform initial status computation (at spawn time 0)
+    computeNextStatus(&local_person, 0, local_count);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    printf("processSimulationParallel barrier 0 rank=%d\n", rank);
+
+    // Simulation loop
     for (int i = 1; i <= TOTAL_SIMULATION_TIME; i++)
     {
-        if (rank == MASTER)
-        {
-            #ifdef DEBUG
-                printf("simulation time %d\n", i);
-            #endif
-            
-            // reset ZONE for each simulation time
-            resetZone();
-        }
+        resetZoneParallel(rank, size);
 
+        // Synchronize ranks before processing
         MPI_Barrier(MPI_COMM_WORLD);
-        printf("barrier 1 rank=%d\n", rank);
+        printf("processSimulationParallel barrier 1 rank=%d\n", rank);
 
-        // update location of each person
-        updateLocation(&local_person, 0, chunk);
+        // Update location of each person
+        updateLocation(&local_person, 0, local_count);
         MPI_Barrier(MPI_COMM_WORLD);
+        printf("processSimulationParallel barrier 2 rank=%d\n", rank);
 
-        printf("barrier 2 rank=%d\n", rank);
-
-        // decrement effect time for each person
-        decrementEffectTime(&local_person, 0, chunk);
+        // Decrement effect time for each person
+        decrementEffectTime(&local_person, 0, local_count);
         MPI_Barrier(MPI_COMM_WORLD);
+        printf("processSimulationParallel barrier 3 rank=%d\n", rank);
 
-        printf("barrier 3 rank=%d\n", rank);
-
-        // compute status for next simulation time
-        computeNextStatus(&local_person, 0, chunk);
+        // Compute status for next simulation time
+        computeNextStatus(&local_person, 0, local_count);
         MPI_Barrier(MPI_COMM_WORLD);
-
-        printf("barrier 4 rank=%d\n", rank);
+        printf("processSimulationParallel barrier 4 rank=%d\n", rank);
 
         if (rank == MASTER)
         {
             #ifdef DEBUG
-                printf("debug for parallel simulation\n");
+                printf("Debug information for parallel simulation:\n");
                 printDebug(i, &local_person);
             #endif
         }
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    // Gather results back to the master
+    sendcounts = malloc(size * sizeof(int));
+    displs = malloc(size * sizeof(int));
 
-    if (rank != MASTER)
-    {
-        // gather local_person -> st_person
-        MPI_Gather(local_person, chunk * sizeof(struct person), MPI_BYTE,
-            *st_person, chunk * sizeof(struct person), MPI_BYTE,
-            0, MPI_COMM_WORLD);
+    for (int i = 0; i < size; i++) {
+        int rank_start = i * (PEOPLE_COUNT / size);
+        int rank_end = (i == size - 1) ? PEOPLE_COUNT : (i + 1) * (PEOPLE_COUNT / size);
+        
+        // Each rank will get the same chunk size except for the last rank
+        sendcounts[i] = rank_end - rank_start;
+        displs[i] = rank_start;
+
+        printf("rank=%d, sendcounts[%d]=%d, displs[%d]=%d\n", rank, i, sendcounts[i], i, displs[i]);
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Gather(local_person, local_count * sizeof(struct person), MPI_BYTE,
+                *st_person, *sendcounts, MPI_BYTE,
+                MASTER, MPI_COMM_WORLD);
 
+    free(sendcounts);
+    free(displs);
     free(local_person);
-}
-
-void resetZoneParallel()
-{
-    // make sure it is called by one thread only per simulation time
-    #pragma omp single
-    {
-        if (!isResetZoneCalled)
-        {
-            resetZone();
-            isResetZoneCalled = 1;
-        }
-    }
 }
 
  

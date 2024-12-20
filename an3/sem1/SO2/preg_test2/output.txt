@@ -1,0 +1,8 @@
+dir/dir5/random_text_3.txt;54;3; 57
+dir/dir1/dir2/random_text_5.txt;3177;519; 3696
+dir/dir3/random_text_9.txt;12738;2105; 14843
+dir/dir4/random_text_2.txt;13952;2298; 16250
+dir/dir1/dir8/random_text_7.txt;15159;2505; 17664
+dir/dir2/random_text_6.txt;18844;3108; 21952
+dir/dir1/dir2/random_text_4.txt;25247;4171; 29418
+dir/dir2/random_text_8.txt;25247;4171; 29418

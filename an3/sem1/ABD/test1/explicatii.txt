@@ -1,0 +1,96 @@
+First create 2 folders and put following files:
+    scripts/create_table.sql
+    data/name.basics.tsv
+
+create_table.sql:
+CREATE DATABASE IF NOT EXISTS `name_basics`;
+
+USE `name_basics`;
+
+DROP TABLE IF EXISTS persons;
+
+CREATE TABLE persons (
+    nconst VARCHAR(255) PRIMARY KEY,
+    primaryName VARCHAR(255) NOT NULL,
+    birthYear VARCHAR(4),
+    deathYear VARCHAR(4),
+    primaryProfession VARCHAR(255),
+    knownForTitles VARCHAR(255)
+);
+
+Execute:
+docker-compose -f docker-compose-master.yml up -d
+docker exec -it mysql-master mysql -u root -ppassword < /home/scripts/create_table.sql
+
+this will create all master/slaves containers and create database and table for master
+
+Execute
+docker exec -it mysql-master mysql -u root -ppasword and run SHOW MASTER STATUS;
+
+Copy values from file, position and insert them to following scripts for execution:
+
+# Connect to slave 1
+docker exec -it mysql-slave1 mysql -uroot -ppassword -e "
+CHANGE MASTER TO
+  MASTER_HOST='mysql-master',
+  MASTER_USER='repl_user',
+  MASTER_PASSWORD='repl_pass',
+  MASTER_LOG_FILE='mysql-bin.000004',  -- Replace with the actual log file name from SHOW MASTER STATUS
+  MASTER_LOG_POS= 932;  -- Replace with the actual position from SHOW MASTER STATUS
+START SLAVE;"
+
+# Connect to slave 2 similarly
+docker exec -it mysql-slave2 mysql -uroot -ppassword -e "
+CHANGE MASTER TO
+  MASTER_HOST='mysql-master',
+  MASTER_USER='repl_user',
+  MASTER_PASSWORD='repl_pass',
+  MASTER_LOG_FILE='mysql-bin.000004',  -- Replace with the actual log file name from SHOW MASTER STATUS
+  MASTER_LOG_POS= 932;  -- Replace with the actual position from SHOW MASTER STATUS
+START SLAVE;"
+
+# Connect to slave 3 similarly
+docker exec -it mysql-slave3 mysql -uroot -ppassword -e "
+CHANGE MASTER TO
+  MASTER_HOST='mysql-master',
+  MASTER_USER='repl_user',
+  MASTER_PASSWORD='repl_pass',
+  MASTER_LOG_FILE='mysql-bin.000004',  -- Replace with the actual log file name from SHOW MASTER STATUS
+  MASTER_LOG_POS= 932;  -- Replace with the actual position from SHOW MASTER STATUS
+START SLAVE;"
+
+Now we can load the data in master database using:
+
+LOAD DATA LOCAL INFILE '/home/data/name.basics.tsv' INTO TABLE name_basics.persons;
+
+Create a full text index for search and use following queries in master container:
+
+USE name_basics;
+
+ALTER TABLE persons ADD FULLTEXT INDEX (primaryName);
+
+mysql> SELECT * FROM persons WHERE MATCH(primaryName) AGAINST('dalf' IN BOOLEAN MODE);
++------------+-------------+-----------+-----------+----------------------+----------------+
+| nconst     | primaryName | birthYear | deathYear | primaryProfession    | knownForTitles |
++------------+-------------+-----------+-----------+----------------------+----------------+
+| nm12275118 | Dalf        | NULL      | NULL      | animation_department | tt4135766      |
+| nm7302874  | Glenn Dalf  | NULL      | NULL      | actor                | tt4658508      |
++------------+-------------+-----------+-----------+----------------------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM persons WHERE MATCH(primaryName) AGAINST('stie' IN BOOLEAN MODE);
++------------+------------------------------+-----------+-----------+----------------------------------------------------+------------------------------------------+
+| nconst     | primaryName                  | birthYear | deathYear | primaryProfession                                  | knownForTitles                           |
++------------+------------------------------+-----------+-----------+----------------------------------------------------+------------------------------------------+
+| nm12395449 | Karolina Bieszczad-Stie      | NULL      | NULL      | editorial_department,editor                        | tt14223810,tt22265060                    |
+| nm1500593  | Stein Stie                   | NULL      | NULL      | cinematographer,camera_department                  | tt0410648,tt2657570,tt1657274,tt5878656  |
+| nm15341540 | Tone Merethe Volla Tøstie   | NULL      | NULL      | miscellaneous                                      | tt29451821                               |
+| nm15840949 | Ida Hegaard Stie Møller-Dam | NULL      | NULL      | producer                                           | tt31389692                               |
+| nm16367395 | Timian Tøstie               | NULL      | NULL      | miscellaneous,actor                                | tt31632610                               |
+| nm1846104  | Keith Stie                   | NULL      | NULL      | actor                                              | tt0398037                                |
+| nm6364351  | Tale Tøstie                 | NULL      | NULL      | actress                                            | tt2171037                                |
+| nm6862681  | The Stie                     | NULL      | NULL      | composer                                           | tt4142086                                |
+| nm7389487  | Keith Stie                   | NULL      | NULL      | actor                                              | tt4770164                                |
+| nm9544859  | Selene Stie                  | NULL      | NULL      | production_manager,miscellaneous,script_department | tt14217100,tt8829128,tt8736020,tt8147656 |
++------------+------------------------------+-----------+-----------+----------------------------------------------------+------------------------------------------+
+10 rows in set (0.01 sec)

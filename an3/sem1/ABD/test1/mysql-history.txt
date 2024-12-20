@@ -1,0 +1,8 @@
+SHOW MASTER STATUS; -> copy file, position
+
+LOAD DATA LOCAL INFILE '/home/data/name.basics.tsv' INTO TABLE name_basics.persons;
+
+ALTER TABLE persons ADD FULLTEXT INDEX (primaryName);
+
+SELECT * FROM persons WHERE MATCH(primaryName) AGAINST('dalf' IN BOOLEAN MODE);
+SELECT * FROM persons WHERE MATCH(primaryName) AGAINST('stie' IN BOOLEAN MODE);
