@@ -1,0 +1,12 @@
+hi from GRIGORI DMITRII
+
+make sure to be in main directory and not in part1 folder
+
+test processes
+javac part1/Smpd.java; javac part1/MPIExec.java; java part1.MPIExec -processes 2 5010 5011 /bin/sh part1/script.sh
+
+test hosts, open 2 terminals and write in first:
+javac part1/Smpd.java; java part1.Smpd 5010
+
+and in second:
+javac part1/MPIExec.java; java part1.MPIExec -hosts 1 localhost /bin/sh part1/script.sh

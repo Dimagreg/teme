@@ -1,0 +1,15 @@
+Hi again 
+
+make sure to be in main directory and not in part2
+
+run:
+javac part2/MPI.java; javac part2/MPIDemonstration.java
+
+open 2 separate terminals and run in the same time:
+java part2.MPIDemonstration 0 5010 5010 5011
+java part2.MPIDemonstration 1 5011 5010 5011
+
+params:
+#1 - rank of running process
+#2 - port of running process
+#3 - list of all ports in comm world to connect to
