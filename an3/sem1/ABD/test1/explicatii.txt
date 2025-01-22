@@ -20,12 +20,15 @@ CREATE TABLE persons (
 
 Execute:
 docker-compose -f docker-compose-master.yml up -d
+
 docker exec -it mysql-master mysql -u root -ppassword < /home/scripts/create_table.sql
+WINDOWS:
+Get-Content ".\scripts\create_table.sql" | docker exec -i mysql-master mysql -u root -ppassword
 
 this will create all master/slaves containers and create database and table for master
 
 Execute
-docker exec -it mysql-master mysql -u root -ppasword and run SHOW MASTER STATUS;
+docker exec -it mysql-master mysql -u root -ppassword and run SHOW MASTER STATUS;
 
 Copy values from file, position and insert them to following scripts for execution:
 
@@ -61,7 +64,7 @@ START SLAVE;"
 
 Now we can load the data in master database using:
 
-LOAD DATA LOCAL INFILE '/home/data/name.basics.tsv' INTO TABLE name_basics.persons;
+LOAD DATA LOCAL INFILE '/home/data/name.basics.tsv/name.basics.tsv' INTO TABLE name_basics.persons;
 
 Create a full text index for search and use following queries in master container:
 

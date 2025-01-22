@@ -4,7 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - /mysql_data:/mysql_data
-      - /mysql_conf:/mysql_conf
+      - ./mysql_data:/mysql_data
+      - ./mysql_conf:/mysql_conf
     environment:
-      MYSQL_ROOT_PASSWORD: dima
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: studentdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password

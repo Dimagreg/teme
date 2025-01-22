@@ -1,0 +1,45 @@
+version: '3'
+services:
+  ndb-management:
+    image: mysql/mysql-cluster
+    container_name: ndb-management
+    command: ndb_mgmd
+    networks:
+      - cluster-network
+
+  ndb-data-1:
+    image: mysql/mysql-cluster
+    container_name: ndb-data-1
+    command: ndbd
+    depends_on:
+      - ndb-management
+    networks:
+      - cluster-network
+
+  ndb-data-2:
+    image: mysql/mysql-cluster
+    container_name: ndb-data-2
+    command: ndbd
+    depends_on:
+      - ndb-management
+    networks:
+      - cluster-network
+
+  mysql-node:
+    image: mysql/mysql-cluster
+    container_name: mysql-node
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    command: mysqld
+    depends_on:
+      - ndb-management
+      - ndb-data-1
+      - ndb-data-2
+    networks:
+      - cluster-network
+    volumes:
+    - ./master_data:/var/lib/mysql
+
+networks:
+  cluster-network:
+    driver: bridge

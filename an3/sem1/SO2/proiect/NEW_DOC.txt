@@ -1,0 +1,10 @@
+1. Create docker container for raspberry pi on ARM64, Debian 12
+docker run --rm -p 2222:2222 -it -v .\raspberry_v:/dist ptrsr/pi-ci start 
+
+download Linaro:
+for Raspberry Pi OS (64-bit), Pi 3, 4, or newer - 64-bit ARMv8 architecture
+https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+
+for Raspberry Pi OS (32-bit) or older Pi models (Pi 1, Pi 2, Pi Zero) - 32-bit ARMv8 architecture
+https://releases.linaro.org/components/toolchain/binaries/latest-7/armv8l-linux-gnueabihf/gcc-linaro-7.5.0-2019.12-x86_64_armv8l-linux-gnueabihf.tar.xz
+

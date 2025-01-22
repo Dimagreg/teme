@@ -18,7 +18,6 @@ RUN [ ! -d /var/run/sshd ] && mkdir /var/run/sshd || true && \
 # Copy hello_world_c directory to /home/pi/hello_world_c in the container
 COPY /example_code/hello_world_c /home/pi/hello_world_c
 
-
 # Expose the SSH port
 EXPOSE 22
 

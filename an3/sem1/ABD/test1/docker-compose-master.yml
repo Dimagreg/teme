@@ -16,6 +16,7 @@ services:
       - ./master_my.cnf:/etc/mysql/my.cnf
       - ./scripts:/home/scripts
       - ./data:/home/data
+    entrypoint: ["/bin/bash", "-c", "chown mysql:mysql /etc/mysql/my.cnf && chmod 600 /etc/mysql/my.cnf && exec mysqld"]
     networks:
       - mysql-network
 
@@ -32,6 +33,7 @@ services:
     volumes:
       - slave1_data:/var/lib/mysql
       - ./slave1_my.cnf:/etc/mysql/my.cnf
+    entrypoint: ["/bin/bash", "-c", "chown mysql:mysql /etc/mysql/my.cnf && chmod 600 /etc/mysql/my.cnf && exec mysqld"]
     networks:
       - mysql-network
 
@@ -48,6 +50,7 @@ services:
     volumes:
       - slave2_data:/var/lib/mysql
       - ./slave2_my.cnf:/etc/mysql/my.cnf
+    entrypoint: ["/bin/bash", "-c", "chown mysql:mysql /etc/mysql/my.cnf && chmod 600 /etc/mysql/my.cnf && exec mysqld"]
     networks:
       - mysql-network
 
@@ -64,6 +67,7 @@ services:
     volumes:
       - slave3_data:/var/lib/mysql
       - ./slave3_my.cnf:/etc/mysql/my.cnf
+    entrypoint: ["/bin/bash", "-c", "chown mysql:mysql /etc/mysql/my.cnf && chmod 600 /etc/mysql/my.cnf && exec mysqld"]
     networks:
       - mysql-network
 
