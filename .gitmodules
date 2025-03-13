@@ -1,0 +1,3 @@
+[submodule "an3/sem2/SSC/proiect"]
+	path = an3/sem2/SSC/proiect
+	url = https://github.com/DimagregUPT/api-security-oauth-jwt.git
