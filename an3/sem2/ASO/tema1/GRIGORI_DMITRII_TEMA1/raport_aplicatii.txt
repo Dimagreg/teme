@@ -1,0 +1,7 @@
+1. SecurityHealth - Aplicatie necesara pentru notificarea si returnarea statusului privitor la Windows Security features
+2. RtkAudUService - Realtek Audio Universal Service, aplicatie de driver pentru servicii de audio
+3. SteelSeriesGG - aplicatie necesara pentru configurarea perifericilor gaming de la firma SteelSeries.
+4. MicrosoftEdgeAutoLaunch_0B2C2E426C40B97746841793B482FFED - aplicatie care porneste Microsoft edge in background pentru a imbunatati performanta acestuia (nu stiam si l-am deconectat :) )
+5. OneDrive - cloud storage nativ de la Microsoft
+6. Docker Desktop - aplicatie pentru functionarea a aplicatiilor containerizate si a microserviciilor
+7. Microsoft.Lists - componenta pentru sincronizarea datelor din local machine cu cloud (OneDrive)

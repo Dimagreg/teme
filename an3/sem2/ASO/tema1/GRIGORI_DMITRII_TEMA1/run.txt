@@ -1,0 +1,23 @@
+Computer Name: ACER-V15-DIMA
+Applications run on startup on local machine:
+Number of values: 3
+(1) SecurityHealth
+(1) path: %windir%\system32\SecurityHealthSystray.exe
+(2) RtkAudUService
+(2) path: "C:\WINDOWS\System32\DriverStore\FileRepository\realtekservice.inf_amd64_cfe2ca03fab15f4c\RtkAudUService64.exe" -background
+(3) SteelSeriesGG
+(3) path: "C:\Program Files\SteelSeries\GG\SteelSeriesGG.exe" -dataPath="C:\ProgramData\SteelSeries\GG" -dbEnv=production -auto=true
+Applications run on startup on current user:
+Number of values: 4
+(1) MicrosoftEdgeAutoLaunch_0B2C2E426C40B97746841793B482FFED
+(1) path: "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --no-startup-window --win-session-start
+(2) OneDrive
+(2) path: "C:\Users\dima\AppData\Local\Microsoft\OneDrive\OneDrive.exe" /background
+(3) Docker Desktop
+(3) path: D:\docker\Docker Desktop.exe
+(4) Microsoft.Lists
+(4) path: C:\Users\dima\AppData\Local\Microsoft\OneDrive\25.020.0202.0001\Microsoft.SharePoint.exe
+
+D:\teme\an3\sem2\ASO\tema1\Project1\x64\Release\Project1.exe (process 22908) exited with code 0 (0x0).
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . . .
