@@ -7,7 +7,22 @@ const users = [];
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.headers;
+
+    // Check if all required fields are provided
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Please provide all required fields' });
+    }
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) { 
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+    // Validate password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/; // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number' });
+    }
     
     // Check if user already exists
     const userExists = users.find(user => user.email === email);
@@ -41,8 +56,10 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    
+    const { email, password } = req.headers;
+
+    console.log(users);
+      
     // Check if user exists
     const user = users.find(user => user.email === email);
     if (!user) {
