@@ -17,18 +17,24 @@ class CityViewModel(
 ) : ViewModel() {
 
     companion object {
-        private const val KEY_ORIGIN_CITY = "origin_city"
-        private const val KEY_DESTINATION_CITY = "destination_city"
+        private const val KEY_ORIGIN_NAME = "origin_name"
+        private const val KEY_ORIGIN_LAT = "origin_lat"
+        private const val KEY_ORIGIN_LON = "origin_lon"
+
+        private const val KEY_DEST_NAME = "dest_name"
+        private const val KEY_DEST_LAT = "dest_lat"
+        private const val KEY_DEST_LON = "dest_lon"
+
         private const val KEY_SELECTED_DATE = "selected_date"
     }
 
-    private val _originCity = mutableStateOf(
-        savedStateHandle.get<City?>(KEY_ORIGIN_CITY)
+    private val _originCity = mutableStateOf<City?>(
+        restoreCity(KEY_ORIGIN_NAME, KEY_ORIGIN_LAT, KEY_ORIGIN_LON)
     )
     val originCity: State<City?> = _originCity
 
-    private val _destinationCity = mutableStateOf(
-        savedStateHandle.get<City?>(KEY_DESTINATION_CITY)
+    private val _destinationCity = mutableStateOf<City?>(
+        restoreCity(KEY_DEST_NAME, KEY_DEST_LAT, KEY_DEST_LON)
     )
     val destinationCity: State<City?> = _destinationCity
 
@@ -40,6 +46,39 @@ class CityViewModel(
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
+    // Helper to restore City from SavedStateHandle
+    private fun restoreCity(nameKey: String, latKey: String, lonKey: String): City? {
+        val name = savedStateHandle.get<String>(nameKey)
+        val lat = savedStateHandle.get<Double>(latKey)
+        val lon = savedStateHandle.get<Double>(lonKey)
+
+        return if (name != null && lat != null && lon != null) {
+            City(name, lat, lon)
+        } else null
+    }
+
+    // Helper to save City to SavedStateHandle
+    private fun saveCity(city: City?, nameKey: String, latKey: String, lonKey: String) {
+        savedStateHandle[nameKey] = city?.name
+        savedStateHandle[latKey] = city?.lat
+        savedStateHandle[lonKey] = city?.lon
+    }
+
+    fun setOriginCity(city: City?) {
+        _originCity.value = city
+        saveCity(city, KEY_ORIGIN_NAME, KEY_ORIGIN_LAT, KEY_ORIGIN_LON)
+    }
+
+    fun setDestinationCity(city: City?) {
+        _destinationCity.value = city
+        saveCity(city, KEY_DEST_NAME, KEY_DEST_LAT, KEY_DEST_LON)
+    }
+
+    fun setDate(date: Long?) {
+        _selectedDate.value = date
+        savedStateHandle[KEY_SELECTED_DATE] = date
+    }
+
     fun findNearestCity() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -50,27 +89,12 @@ class CityViewModel(
                         location.latitude,
                         location.longitude
                     )
-                    _originCity.value = city
+                    setOriginCity(city)
                 }
             } finally {
                 _isLoading.value = false
             }
         }
-    }
-
-    fun setOriginCity(city: City?) {
-        _originCity.value = city
-        savedStateHandle[KEY_ORIGIN_CITY] = city
-    }
-
-    fun setDestinationCity(city: City?) {
-        _destinationCity.value = city
-        savedStateHandle[KEY_DESTINATION_CITY] = city
-    }
-
-    fun setDate(date: Long?) {
-        _selectedDate.value = date
-        savedStateHandle[KEY_SELECTED_DATE] = date
     }
 
     fun getAllCities(): List<City> {

@@ -31,12 +31,15 @@ import java.util.Locale
 @Composable
 fun DatePicker(
     modifier: Modifier = Modifier,
+    selectedDate: Long?,
     onDateSelected: (Long?) -> Unit = {}
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf<Long?>(null) }
 
-    val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    val displayText = selectedDate?.let {
+        dateFormatter.format(Date(it))
+    } ?: "Select Date"
 
     Box(
         modifier = modifier
@@ -48,9 +51,7 @@ fun DatePicker(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = selectedDate?.let {
-                dateFormatter.format(Date(it))
-            } ?: "Select Date",
+            text = displayText,
             fontSize = 14.sp
         )
     }
@@ -65,7 +66,6 @@ fun DatePicker(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        selectedDate = datePickerState.selectedDateMillis
                         onDateSelected(datePickerState.selectedDateMillis)
                         showDialog = false
                     }

@@ -34,6 +34,7 @@ fun CitySelection(
 ) {
     val originCity by viewModel.originCity
     val destinationCity by viewModel.destinationCity
+    val selectedDate by viewModel.selectedDate
     val isLoading by viewModel.isLoading
 
     var showOriginCityDialog by remember { mutableStateOf(false) }
@@ -91,6 +92,7 @@ fun CitySelection(
             )
             DatePicker(
                 modifier = Modifier.weight(3f),
+                selectedDate = selectedDate,
                 onDateSelected = { timestamp ->
                     timestamp?.let {
                         Log.d("DatePicker", "Selected date: ${Date(it)}")
