@@ -1,17 +1,24 @@
 package com.example.cfr_app.service
 
+import City
 import android.location.Location
 import android.util.Log
 
-class CityService {
-    private val TAG = "CityService"
+class CityService(
+    private val firebaseRepo: FirebaseRepository
+) {
+    companion object{
+        private val TAG = "CityService"
+    }
 
-    private val cities = listOf(
-        City("Bucharest", 44.4268, 26.1025),
-        City("Cluj-Napoca", 46.7712, 23.6236),
-        City("Timisoara", 45.7489, 21.2087)
-        // Add more cities
-    )
+    private var cachedCities: List<City> = emptyList()
+
+    suspend fun loadCities() {
+        cachedCities = firebaseRepo.getAllCities()
+        Log.d(TAG, "Cities cached: ${cachedCities.size}")
+    }
+
+    fun getAllCities(): List<City> = cachedCities
 
     private fun calculateDistance(
         lat1: Double, lon1: Double,
@@ -23,8 +30,8 @@ class CityService {
     }
 
     fun findNearestCity(latitude: Double, longitude: Double): City? {
-        val nearestCity = cities.minByOrNull { city ->
-            val distance = calculateDistance(latitude, longitude, city.lat, city.lon)
+        val nearestCity = cachedCities.minByOrNull { city ->
+            val distance = calculateDistance(latitude, longitude, city.latitude, city.longitude)
             Log.d(TAG, "Distance to ${city.name}: $distance km")
             distance
         }
@@ -32,8 +39,4 @@ class CityService {
         Log.i(TAG, "Nearest city: ${nearestCity?.name}")
         return nearestCity
     }
-
-    fun getAllCities(): List<City> = cities
 }
-
-data class City(val name: String, val lat: Double, val lon: Double)

@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cfr_app.service.CityService
+import com.example.cfr_app.service.FirebaseRepository
 import com.example.cfr_app.service.LocationService
 import com.example.cfr_app.ui.menu.BottomNavigationMenu
 import com.example.cfr_app.ui.menu.TopMenuBar
@@ -46,7 +47,8 @@ class MainActivity : ComponentActivity() {
 
                 // Create services and viewModel
                 val locationService = remember { LocationService(this) }
-                val cityService = remember { CityService() }
+                val firebaseRepo = remember { FirebaseRepository() }
+                val cityService = remember { CityService(firebaseRepo) }
                 val viewModel: CityViewModel = viewModel(
                     factory = CityViewModelFactory(
                         locationService = locationService,

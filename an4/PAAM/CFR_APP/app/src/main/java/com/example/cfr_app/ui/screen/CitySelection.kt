@@ -6,10 +6,13 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +29,7 @@ import com.example.cfr_app.ui.button.FindMe
 import com.example.cfr_app.ui.button.Search
 import com.example.cfr_app.ui.viewmodel.CityViewModel
 import java.util.Date
+import City
 
 @Composable
 fun CitySelection(
@@ -36,6 +40,7 @@ fun CitySelection(
     val destinationCity by viewModel.destinationCity
     val selectedDate by viewModel.selectedDate
     val isLoading by viewModel.isLoading
+    val citiesLoaded by viewModel.citiesLoaded // Main UI loading screen
 
     var showOriginCityDialog by remember { mutableStateOf(false) }
     var showDestinationCityDialog by remember { mutableStateOf(false) }
@@ -52,55 +57,64 @@ fun CitySelection(
         }
     }
 
-    Column(
-        modifier
-            .fillMaxWidth(0.8f)
-            .fillMaxHeight(0.2f)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+    if (!citiesLoaded) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            // Origin city
-            CityBlock(
-                modifier = Modifier.weight(3f),
-                city = originCity?.name ?: "From",
-                onClick = { showOriginCityDialog = true }
-            )
-
-            BlockSpacer(Modifier.weight(1f))
-
-            // Destination City
-            CityBlock(
-                modifier = Modifier.weight(3f),
-                city = destinationCity?.name ?: "To",
-                onClick = { showDestinationCityDialog = true }
-            )
+            CircularProgressIndicator()
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
+    } else {
+        Column(
+            modifier
+                .fillMaxWidth(0.8f)
+                .fillMaxHeight(0.2f)
         ) {
-            FindMe(
-                modifier = Modifier.weight(3f),
-                onClick = {
-                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                },
-                isLoading = isLoading
-            )
-            DatePicker(
-                modifier = Modifier.weight(3f),
-                selectedDate = selectedDate,
-                onDateSelected = { timestamp ->
-                    timestamp?.let {
-                        Log.d("DatePicker", "Selected date: ${Date(it)}")
-                        viewModel.setDate(it)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Origin city
+                CityBlock(
+                    modifier = Modifier.weight(3f),
+                    city = originCity?.name ?: "From",
+                    onClick = { showOriginCityDialog = true }
+                )
+
+                BlockSpacer(Modifier.weight(1f))
+
+                // Destination City
+                CityBlock(
+                    modifier = Modifier.weight(3f),
+                    city = destinationCity?.name ?: "To",
+                    onClick = { showDestinationCityDialog = true }
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FindMe(
+                    modifier = Modifier.weight(3f),
+                    onClick = {
+                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    },
+                    isLoading = isLoading
+                )
+                DatePicker(
+                    modifier = Modifier.weight(3f),
+                    selectedDate = selectedDate,
+                    onDateSelected = { timestamp ->
+                        timestamp?.let {
+                            Log.d("DatePicker", "Selected date: ${Date(it)}")
+                            viewModel.setDate(it)
+                        }
                     }
-                }
-            )
-            Search(Modifier.weight(3f))
+                )
+                Search(Modifier.weight(3f))
+            }
         }
     }
 

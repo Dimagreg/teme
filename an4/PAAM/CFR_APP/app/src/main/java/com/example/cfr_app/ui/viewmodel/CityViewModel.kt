@@ -1,14 +1,15 @@
 package com.example.cfr_app.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cfr_app.service.City
 import com.example.cfr_app.service.CityService
 import com.example.cfr_app.service.LocationService
 import kotlinx.coroutines.launch
+import City
 
 class CityViewModel(
     private val locationService: LocationService,
@@ -46,6 +47,25 @@ class CityViewModel(
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
+    private val _citiesLoaded = mutableStateOf(false)
+    val citiesLoaded: State<Boolean> = _citiesLoaded
+
+    init {
+        loadCitiesFromFirebase()
+    }
+
+    private fun loadCitiesFromFirebase() {
+        viewModelScope.launch {
+            try {
+                cityService.loadCities()
+                _citiesLoaded.value = true
+                Log.d("CityViewModel", "Cities loaded from Firebase: ${cityService.getAllCities().size}")
+            } catch (e: Exception) {
+                Log.e("CityViewModel", "Failed to load cities from Firebase", e)
+            }
+        }
+    }
+
     // Helper to restore City from SavedStateHandle
     private fun restoreCity(nameKey: String, latKey: String, lonKey: String): City? {
         val name = savedStateHandle.get<String>(nameKey)
@@ -60,8 +80,8 @@ class CityViewModel(
     // Helper to save City to SavedStateHandle
     private fun saveCity(city: City?, nameKey: String, latKey: String, lonKey: String) {
         savedStateHandle[nameKey] = city?.name
-        savedStateHandle[latKey] = city?.lat
-        savedStateHandle[lonKey] = city?.lon
+        savedStateHandle[latKey] = city?.latitude
+        savedStateHandle[lonKey] = city?.longitude
     }
 
     fun setOriginCity(city: City?) {
