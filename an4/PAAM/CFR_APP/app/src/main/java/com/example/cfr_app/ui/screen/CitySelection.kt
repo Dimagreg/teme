@@ -47,6 +47,7 @@ fun CitySelection(
     val citiesLoaded by viewModel.citiesLoaded // Main UI loading screen
     val trainResults by viewModel.trainResults
     val isSearchingTrains by viewModel.isSearchingTrains
+    val selectedTrain by viewModel.selectedTrain
 
     var showOriginCityDialog by remember { mutableStateOf(false) }
     var showDestinationCityDialog by remember { mutableStateOf(false) }
@@ -130,26 +131,43 @@ fun CitySelection(
             Spacer(modifier = Modifier.height(40.dp))
 
             // Train results
-            if (isSearchingTrains) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (trainResults.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(trainResults) { train ->
-                        TrainResultBlock(
-                            train = train,
-                            onClick = {
-                                Log.d("CitySelection", "Train ${train.trainNumber} clicked")
-                                // TODO: Navigate to train details
-                            }
-                        )
+            if (selectedTrain != null) {
+                // Show train details
+                TrainDetailsView(
+                    train = selectedTrain!!,
+                    onDetailsClick = {
+                        // TODO: Navigate to full train details
+                        Log.d("CitySelection", "Details clicked for train ${selectedTrain!!.trainNumber}")
+                    },
+                    onRefreshClick = {
+                        viewModel.refreshTrainDetails()
+                    },
+                    onBackClick = {
+                        viewModel.selectTrain(null)
+                    }
+                )
+            } else {
+                // Show train results list
+                if (isSearchingTrains) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (trainResults.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        items(trainResults) { train ->
+                            TrainResultBlock(
+                                train = train,
+                                onClick = {
+                                    viewModel.selectTrain(train)
+                                }
+                            )
+                        }
                     }
                 }
             }

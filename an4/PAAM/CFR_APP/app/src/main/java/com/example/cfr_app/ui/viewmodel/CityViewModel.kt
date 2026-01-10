@@ -59,6 +59,9 @@ class CityViewModel(
     private val _isSearchingTrains = mutableStateOf(false)
     val isSearchingTrains = _isSearchingTrains
 
+    private val _selectedTrain = mutableStateOf<Train?>(null)
+    val selectedTrain: State<Train?> = _selectedTrain
+
     init {
         loadCitiesFromFirebase()
     }
@@ -151,6 +154,33 @@ class CityViewModel(
                 _trainResults.value = emptyList()
             } finally {
                 _isSearchingTrains.value = false
+            }
+        }
+    }
+
+    fun selectTrain(train: Train?) {
+        _selectedTrain.value = train
+    }
+
+
+    fun refreshTrainDetails() {
+        viewModelScope.launch {
+            val train = _selectedTrain.value ?: return@launch
+            _isLoading.value = true
+            try {
+                // Refresh train data from Firebase
+                val origin = train.originCity
+                val destination = train.destinationCity
+                val date = train.departureTimestamp?.toDate()?.time ?: return@launch
+
+                val results = firebaseRepo.searchTrains(origin, destination, date)
+                val updatedTrain = results.find { it.trainNumber == train.trainNumber }
+                _selectedTrain.value = updatedTrain
+                Log.d("CityViewModel", "Train details refreshed")
+            } catch (e: Exception) {
+                Log.e("CityViewModel", "Failed to refresh train details", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
