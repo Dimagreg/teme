@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +31,11 @@ import com.example.cfr_app.ui.button.Search
 import com.example.cfr_app.ui.viewmodel.CityViewModel
 import java.util.Date
 import City
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.unit.dp
+import com.example.cfr_app.ui.block.TrainResultBlock
 
 @Composable
 fun CitySelection(
@@ -41,6 +47,8 @@ fun CitySelection(
     val selectedDate by viewModel.selectedDate
     val isLoading by viewModel.isLoading
     val citiesLoaded by viewModel.citiesLoaded // Main UI loading screen
+    val trainResults by viewModel.trainResults
+    val isSearchingTrains by viewModel.isSearchingTrains
 
     var showOriginCityDialog by remember { mutableStateOf(false) }
     var showDestinationCityDialog by remember { mutableStateOf(false) }
@@ -68,8 +76,9 @@ fun CitySelection(
         Column(
             modifier
                 .fillMaxWidth(0.8f)
-                .fillMaxHeight(0.2f)
+                .fillMaxSize()
         ) {
+            // City Selection
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -91,6 +100,7 @@ fun CitySelection(
                     onClick = { showDestinationCityDialog = true }
                 )
             }
+            // Actions
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
@@ -113,7 +123,37 @@ fun CitySelection(
                         }
                     }
                 )
-                Search(Modifier.weight(3f))
+                Search(
+                    modifier = Modifier.weight(3f),
+                    onClick = { viewModel.searchTrains() }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Train results
+            if (isSearchingTrains) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (trainResults.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(trainResults) { train ->
+                        TrainResultBlock(
+                            train = train,
+                            onClick = {
+                                Log.d("CitySelection", "Train ${train.trainNumber} clicked")
+                                // TODO: Navigate to train details
+                            }
+                        )
+                    }
+                }
             }
         }
     }

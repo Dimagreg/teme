@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.cfr_app.service.CityService
+import com.example.cfr_app.service.FirebaseRepository
 import com.example.cfr_app.service.LocationService
 
 class CityViewModelFactory(
     private val locationService: LocationService,
-    private val cityService: CityService
+    private val cityService: CityService,
+    private val firebaseRepo: FirebaseRepository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(
@@ -23,6 +25,7 @@ class CityViewModelFactory(
             return CityViewModel(
                 locationService = locationService,
                 cityService = cityService,
+                firebaseRepo = firebaseRepo,
                 savedStateHandle = savedStateHandle
             ) as T
         }

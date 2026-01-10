@@ -52,7 +52,8 @@ class MainActivity : ComponentActivity() {
                 val viewModel: CityViewModel = viewModel(
                     factory = CityViewModelFactory(
                         locationService = locationService,
-                        cityService = cityService
+                        cityService = cityService,
+                        firebaseRepo = firebaseRepo
                     )
                 )
 

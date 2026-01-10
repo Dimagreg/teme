@@ -10,10 +10,13 @@ import com.example.cfr_app.service.CityService
 import com.example.cfr_app.service.LocationService
 import kotlinx.coroutines.launch
 import City
+import com.example.cfr_app.service.FirebaseRepository
+import com.example.cfr_app.service.data.Train
 
 class CityViewModel(
     private val locationService: LocationService,
     private val cityService: CityService,
+    private val firebaseRepo: FirebaseRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -49,6 +52,12 @@ class CityViewModel(
 
     private val _citiesLoaded = mutableStateOf(false)
     val citiesLoaded: State<Boolean> = _citiesLoaded
+
+    private val _trainResults = mutableStateOf<List<Train>>(emptyList())
+    val trainResults: State<List<Train>> = _trainResults
+
+    private val _isSearchingTrains = mutableStateOf(false)
+    val isSearchingTrains = _isSearchingTrains
 
     init {
         loadCitiesFromFirebase()
@@ -120,4 +129,34 @@ class CityViewModel(
     fun getAllCities(): List<City> {
         return cityService.getAllCities()
     }
+
+    fun searchTrains() {
+        viewModelScope.launch {
+            val origin = _originCity.value?.name
+            val destination = _destinationCity.value?.name
+            val date = _selectedDate.value
+
+            if (origin == null || destination == null || date == null) {
+                Log.w("CityViewModel", "Cannot search: missing origin, destination, or date")
+                return@launch
+            }
+
+            _isSearchingTrains.value = true
+            try {
+                val results = firebaseRepo.searchTrains(origin, destination, date)
+                _trainResults.value = results
+                Log.d("CityViewModel", "Search completed: ${results.size} trains found")
+            } catch (e: Exception) {
+                Log.e("CityViewModel", "Search failed", e)
+                _trainResults.value = emptyList()
+            } finally {
+                _isSearchingTrains.value = false
+            }
+        }
+    }
+
+    fun clearTrainResults() {
+        _trainResults.value = emptyList()
+    }
+
 }
