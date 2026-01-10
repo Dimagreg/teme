@@ -19,7 +19,10 @@ class FirebaseRepository {
 
     suspend fun getAllCities(): List<City> {
         return try {
-            val snapshot = citiesCollection.get().await()
+            val snapshot = citiesCollection
+                .orderBy("name")
+                .get()
+                .await()
             val cities = snapshot.documents.mapNotNull { doc ->
                 doc.toObject(City::class.java)
             }

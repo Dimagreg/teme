@@ -43,7 +43,7 @@ class CityViewModel(
     val destinationCity: State<City?> = _destinationCity
 
     private val _selectedDate = mutableStateOf(
-        savedStateHandle.get<Long?>(KEY_SELECTED_DATE)
+        savedStateHandle.get<Long?>(KEY_SELECTED_DATE) ?: System.currentTimeMillis()
     )
     val selectedDate: State<Long?> = _selectedDate
 
@@ -103,7 +103,7 @@ class CityViewModel(
         saveCity(city, KEY_DEST_NAME, KEY_DEST_LAT, KEY_DEST_LON)
     }
 
-    fun setDate(date: Long?) {
+    fun setDate(date: Long) {
         _selectedDate.value = date
         savedStateHandle[KEY_SELECTED_DATE] = date
     }

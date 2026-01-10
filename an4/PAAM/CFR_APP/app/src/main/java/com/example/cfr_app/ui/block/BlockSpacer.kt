@@ -8,19 +8,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.cfr_app.ui.theme.CFR_LIGHT_GREEN
 
 @Composable
 fun BlockSpacer(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = CFR_LIGHT_GREEN
 ) {
     Box(
         modifier = modifier
             .height(15.dp)
             .padding(5.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(CFR_LIGHT_GREEN)
+            .background(backgroundColor)
     ) {
         // empty
     }
