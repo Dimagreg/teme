@@ -34,6 +34,7 @@ fun TrainPickerScreen(
     val trainSearchResults by viewModel.trainSearchResults
     val isSearchingByNumber by viewModel.isSearchingByNumber
     val selectedTrain by viewModel.selectedTrain
+    val hasSearched by viewModel.hasSearched
 
     var showTrainNumberDialog by remember { mutableStateOf(false) }
 
@@ -136,7 +137,7 @@ fun TrainPickerScreen(
                         )
                     }
                 }
-            } else if (selectedTrainNumber != null) {
+            } else if (hasSearched && selectedTrainNumber != null) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center

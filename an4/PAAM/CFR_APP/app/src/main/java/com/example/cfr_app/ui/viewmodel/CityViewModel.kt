@@ -62,6 +62,9 @@ class CityViewModel(
     private val _selectedTrain = mutableStateOf<Train?>(null)
     val selectedTrain: State<Train?> = _selectedTrain
 
+    private val _hasSearchedTrains = mutableStateOf(false)
+    val hasSearchedTrains: State<Boolean> = _hasSearchedTrains
+
     init {
         loadCitiesFromFirebase()
     }
@@ -99,16 +102,22 @@ class CityViewModel(
     fun setOriginCity(city: City?) {
         _originCity.value = city
         saveCity(city, KEY_ORIGIN_NAME, KEY_ORIGIN_LAT, KEY_ORIGIN_LON)
+
+        _hasSearchedTrains.value = false
     }
 
     fun setDestinationCity(city: City?) {
         _destinationCity.value = city
         saveCity(city, KEY_DEST_NAME, KEY_DEST_LAT, KEY_DEST_LON)
+
+        _hasSearchedTrains.value = false
     }
 
     fun setDate(date: Long) {
         _selectedDate.value = date
         savedStateHandle[KEY_SELECTED_DATE] = date
+
+        _hasSearchedTrains.value = false
     }
 
     fun findNearestCity() {
@@ -145,6 +154,7 @@ class CityViewModel(
             }
 
             _isSearchingTrains.value = true
+            _hasSearchedTrains.value = true
             try {
                 val results = firebaseRepo.searchTrains(origin, destination, date)
                 _trainResults.value = results

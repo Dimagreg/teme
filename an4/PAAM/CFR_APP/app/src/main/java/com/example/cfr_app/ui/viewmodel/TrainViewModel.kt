@@ -42,6 +42,9 @@ class TrainViewModel(
     private val _selectedTrain = mutableStateOf<Train?>(null)
     val selectedTrain: State<Train?> = _selectedTrain
 
+    private val _hasSearched = mutableStateOf(false)
+    val hasSearched: State<Boolean> = _hasSearched
+
     init {
         loadAllTrainNumber()
     }
@@ -54,6 +57,7 @@ class TrainViewModel(
     fun selectTrainNumber(trainNumber: String) {
         _selectedTrainNumber.value = trainNumber
         savedStateHandle[KEY_TRAIN_NUMBER] = trainNumber
+        _hasSearched.value = false
     }
 
     fun selectTrain(train: Train?) {
@@ -83,6 +87,7 @@ class TrainViewModel(
             }
 
             _isSearchingByNumber.value = true
+            _hasSearched.value = true
             try {
                 val results = firebaseRepo.searchTrainsByNumber(trainNumber, date)
                 _trainSearchResults.value = results

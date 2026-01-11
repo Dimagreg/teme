@@ -32,6 +32,7 @@ import java.util.Date
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
 import com.example.cfr_app.ui.block.TrainResultBlock
 
@@ -48,6 +49,7 @@ fun CitySelection(
     val trainResults by viewModel.trainResults
     val isSearchingTrains by viewModel.isSearchingTrains
     val selectedTrain by viewModel.selectedTrain
+    val hasSeachedTrains by viewModel.hasSearchedTrains
 
     var showOriginCityDialog by remember { mutableStateOf(false) }
     var showDestinationCityDialog by remember { mutableStateOf(false) }
@@ -168,6 +170,13 @@ fun CitySelection(
                                 }
                             )
                         }
+                    }
+                } else if (hasSeachedTrains && originCity != null && destinationCity != null) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No trains found for this route")
                     }
                 }
             }
