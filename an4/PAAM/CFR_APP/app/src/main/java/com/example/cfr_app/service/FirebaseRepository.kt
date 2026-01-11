@@ -131,4 +131,20 @@ class FirebaseRepository {
             emptyList()
         }
     }
+
+    suspend fun getAppInfo(): String {
+        return try {
+            val snapshot = db.collection("info")
+                .document("0")
+                .get()
+                .await()
+
+            val text = snapshot.getString("text") ?: ""
+            Log.d(TAG, "Loaded app info: ${text.length} characters")
+            text
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading app info", e)
+            ""
+        }
+    }
 }

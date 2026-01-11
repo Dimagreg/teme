@@ -28,6 +28,8 @@ import com.example.cfr_app.ui.screen.AppInfoScreen
 import com.example.cfr_app.ui.screen.CitySelection
 import com.example.cfr_app.ui.screen.TrainPickerScreen
 import com.example.cfr_app.ui.theme.CFR_APPTheme
+import com.example.cfr_app.ui.viewmodel.AppInfoViewModel
+import com.example.cfr_app.ui.viewmodel.AppInfoViewModelFactory
 import com.example.cfr_app.ui.viewmodel.CityViewModel
 import com.example.cfr_app.ui.viewmodel.CityViewModelFactory
 import com.example.cfr_app.ui.viewmodel.TrainViewModel
@@ -61,6 +63,11 @@ class MainActivity : ComponentActivity() {
                 )
                 val trainViewModel: TrainViewModel = viewModel(
                     factory = TrainViewModelFactory(
+                        firebaseRepository = firebaseRepo
+                    )
+                )
+                val appInfoViewModel: AppInfoViewModel = viewModel(
+                    factory = AppInfoViewModelFactory(
                         firebaseRepository = firebaseRepo
                     )
                 )
@@ -114,7 +121,14 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable(Routes.APP_INFO) {
-                            AppInfoScreen()
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                AppInfoScreen(viewModel = appInfoViewModel)
+                            }
                         }
                     }
                 }
