@@ -66,7 +66,6 @@ fun TrainRouteBlock(
             ) {
                 Text(
                     text = train.originCity,
-                    fontWeight = FontWeight.Bold,
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,
                     maxLines = 1
@@ -86,14 +85,13 @@ fun TrainRouteBlock(
             ) {
                 Text(
                     text = departureTime,
-                    fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 )
             }
 
             Spacer(modifier = Modifier.width(2.dp))
 
-            // Block spacer with late time
+            // Late time
             Column(
                 modifier = Modifier
                     .width(40.dp),
@@ -122,7 +120,6 @@ fun TrainRouteBlock(
             ) {
                 Text(
                     text = arrivalTime,
-                    fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 )
             }
@@ -140,7 +137,6 @@ fun TrainRouteBlock(
             ) {
                 Text(
                     text = train.destinationCity,
-                    fontWeight = FontWeight.Bold,
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,
                     maxLines = 1
