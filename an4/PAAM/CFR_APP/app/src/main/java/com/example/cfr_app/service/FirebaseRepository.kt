@@ -34,6 +34,19 @@ class FirebaseRepository {
         }
     }
 
+    suspend fun getAllTrainNumbers(): List<String> {
+        return try {
+            val snapshot = trainsCollection.get().await()
+            snapshot.documents
+                .mapNotNull { it.getString("trainNumber") }
+                .distinct()
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading train numbers", e)
+            emptyList()
+        }
+    }
+
     suspend fun searchTrains(
         originCity: String,
         destinationCity: String,
@@ -74,6 +87,47 @@ class FirebaseRepository {
             trains
         } catch (e: Exception) {
             Log.e(TAG, "Error searching trains", e)
+            emptyList()
+        }
+    }
+
+    suspend fun searchTrainsByNumber(
+        trainNumber: String,
+        selectedDateMillis: Long
+    ): List<Train> {
+        return try {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = selectedDateMillis
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val startOfDay = Timestamp(calendar.time)
+
+            calendar.set(Calendar.HOUR_OF_DAY, 23)
+            calendar.set(Calendar.MINUTE, 59)
+            calendar.set(Calendar.SECOND, 59)
+            calendar.set(Calendar.MILLISECOND, 999)
+            val endOfDay = Timestamp(calendar.time)
+
+            Log.d(TAG, "Searching train: $trainNumber on ${calendar.time}")
+
+            val snapshot = trainsCollection
+                .whereEqualTo("trainNumber", trainNumber)
+                .whereGreaterThanOrEqualTo("departureTimestamp", startOfDay)
+                .whereLessThanOrEqualTo("departureTimestamp", endOfDay)
+                .orderBy("departureTimestamp")
+                .get()
+                .await()
+
+            val trains = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Train::class.java)
+            }
+
+            Log.d(TAG, "Found ${trains.size} trains")
+            trains
+        } catch (e: Exception) {
+            Log.e(TAG, "Error searching trains by number", e)
             emptyList()
         }
     }

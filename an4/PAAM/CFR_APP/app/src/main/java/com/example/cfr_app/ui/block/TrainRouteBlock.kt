@@ -18,13 +18,13 @@ import androidx.compose.ui.unit.sp
 import com.example.cfr_app.service.data.Train
 import com.example.cfr_app.ui.theme.CFR_LIGHT_GREEN
 import com.example.cfr_app.ui.theme.CFR_RESULT_DARK_GREEN_50
-import com.example.cfr_app.ui.theme.CFR_RESULT_ON_TIME_GREEN
 import com.example.cfr_app.ui.theme.CFR_RESULT_LATE_RED
+import com.example.cfr_app.ui.theme.CFR_RESULT_ON_TIME_GREEN
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 @Composable
-fun TrainResultBlock(
+fun TrainRouteBlock(
     train: Train,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
@@ -43,7 +43,8 @@ fun TrainResultBlock(
 
     Card(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(25.dp),
         colors = CardDefaults.cardColors(containerColor = CFR_LIGHT_GREEN)
     ) {
@@ -54,39 +55,45 @@ fun TrainResultBlock(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Train number block
+            // Origin city block
             Box(
                 modifier = Modifier
                     .height(30.dp)
-                    .width(70.dp)
+                    .weight(1.5f)
                     .clip(RoundedCornerShape(6.dp))
                     .background(CFR_RESULT_DARK_GREEN_50),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = train.trainNumber,
-                    textAlign = TextAlign.Center
+                    text = train.originCity,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             // Departure time block
             Box(
                 modifier = Modifier
                     .height(30.dp)
-                    .width(50.dp)
+                    .weight(1f)
                     .clip(RoundedCornerShape(6.dp))
                     .background(punctualityColor),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = departureTime,
-                    textAlign = TextAlign.Center
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
                 )
             }
 
-            // Late time
+            Spacer(modifier = Modifier.width(2.dp))
+
+            // Block spacer with late time
             Column(
                 modifier = Modifier
                     .width(40.dp),
@@ -102,36 +109,41 @@ fun TrainResultBlock(
                 }
             }
 
+            Spacer(modifier = Modifier.width(2.dp))
+
             // Arrival time block
             Box(
                 modifier = Modifier
                     .height(30.dp)
-                    .width(50.dp)
+                    .weight(1f)
                     .clip(RoundedCornerShape(6.dp))
                     .background(punctualityColor),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = arrivalTime,
-                    textAlign = TextAlign.Center
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-            // Details button block
+            // Destination city block
             Box(
                 modifier = Modifier
                     .height(30.dp)
-                    .width(70.dp)
+                    .weight(1.5f)
                     .clip(RoundedCornerShape(6.dp))
-                    .clickable(onClick = onClick)
                     .background(CFR_RESULT_DARK_GREEN_50),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Details",
-                    textAlign = TextAlign.Center
+                    text = train.destinationCity,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
             }
         }

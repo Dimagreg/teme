@@ -30,6 +30,8 @@ import com.example.cfr_app.ui.screen.TrainPickerScreen
 import com.example.cfr_app.ui.theme.CFR_APPTheme
 import com.example.cfr_app.ui.viewmodel.CityViewModel
 import com.example.cfr_app.ui.viewmodel.CityViewModelFactory
+import com.example.cfr_app.ui.viewmodel.TrainViewModel
+import com.example.cfr_app.ui.viewmodel.TrainViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,15 +47,21 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                // Create services and viewModel
+                // Create services and viewModels
                 val locationService = remember { LocationService(this) }
                 val firebaseRepo = remember { FirebaseRepository() }
                 val cityService = remember { CityService(firebaseRepo) }
-                val viewModel: CityViewModel = viewModel(
+
+                val cityViewModel: CityViewModel = viewModel(
                     factory = CityViewModelFactory(
                         locationService = locationService,
                         cityService = cityService,
                         firebaseRepo = firebaseRepo
+                    )
+                )
+                val trainViewModel: TrainViewModel = viewModel(
+                    factory = TrainViewModelFactory(
+                        firebaseRepository = firebaseRepo
                     )
                 )
 
@@ -92,11 +100,18 @@ class MainActivity : ComponentActivity() {
                                     .padding(top = 32.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CitySelection(viewModel = viewModel)
+                                CitySelection(viewModel = cityViewModel)
                             }
                         }
                         composable(Routes.TRAIN_PICKER) {
-                            TrainPickerScreen()
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                TrainPickerScreen(viewModel = trainViewModel)
+                            }
                         }
                         composable(Routes.APP_INFO) {
                             AppInfoScreen()
