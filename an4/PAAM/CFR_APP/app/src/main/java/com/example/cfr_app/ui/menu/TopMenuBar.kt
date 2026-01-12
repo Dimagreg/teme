@@ -17,13 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.cfr_app.R
+import com.example.cfr_app.ui.animation.AnimatedTrailingLines
 import com.example.cfr_app.ui.theme.CFR_DARK_GREEN
 import com.example.cfr_app.ui.theme.CFR_LIGHT_GREEN
 
 @Composable
 fun TopMenuBar(
+    modifier: Modifier = Modifier,
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier
+    isMoving: Boolean = false,
 ) {
     Row(
         modifier = modifier
@@ -36,6 +38,11 @@ fun TopMenuBar(
             painter = painterResource(id = R.drawable.cfr_main_logo),
             contentDescription = "CFR Logo",
             modifier = Modifier.size(140.dp)
+        )
+
+        AnimatedTrailingLines(
+            isMoving = isMoving,
+            modifier = Modifier.offset(y = (-10).dp)
         )
 
         IconButton(
