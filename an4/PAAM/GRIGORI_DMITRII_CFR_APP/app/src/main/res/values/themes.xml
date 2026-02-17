@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CFR_APP" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#D8EACF</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_train</item>
+        <item name="postSplashScreenTheme">@style/Theme.CFR_APP</item>
+    </style>
+</resources>
